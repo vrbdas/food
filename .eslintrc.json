@@ -1,0 +1,53 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": "airbnb-base",
+  "overrides": [],
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
+  "rules": {
+    "linebreak-style": 0,
+    "no-console": 0,
+    "strict": 0,
+    "prefer-const": 1,
+    "no-unused-vars": 1,
+    "prefer-template": 1,
+    "no-useless-concat": 1,
+    "one-var": 1,
+    "no-plusplus": 1,
+    "eqeqeq": 1,
+    "no-unused-expressions": 1,
+    "no-multiple-empty-lines": 1,
+    "no-nested-ternary": 1,
+    "no-restricted-globals": 1,
+    "eol-last": 1,
+    "prefer-arrow-callback": 1,
+    "dot-notation": 1,
+    "no-else-return": 1,
+    "no-restricted-syntax": 0,
+    "guard-for-in": 0,
+    "no-continue": 1,
+    "space-before-function-paren": [1, "never"],
+    "space-infix-ops": 1,
+    "no-use-before-define": ["error", {
+      "functions": false,
+      "classes": true,
+      "variables": true,
+      "allowNamedExports": false}],
+    "operator-assignment": 1,
+    "prefer-object-spread": 1,
+    "object-curly-spacing": [1, "never"],
+    "space-unary-ops": 1,
+    "no-new-object": 1,
+    "no-new-wrappers": 1,
+    "object-shorthand": 1,
+    "quotes": [1, "single", { "allowTemplateLiterals": true }],
+    "arrow-parens": [2, "always"],
+    "no-param-reassign": [2, { "props": false }],
+    "func-names": 0,
+    "no-trailing-spaces": 1
+  }
+}
