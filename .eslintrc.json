@@ -34,7 +34,7 @@
     "no-use-before-define": ["error", {
       "functions": false,
       "classes": true,
-      "variables": true,
+      "variables": false,
       "allowNamedExports": false}],
     "operator-assignment": 1,
     "prefer-object-spread": 1,
@@ -51,7 +51,7 @@
     "no-multiple-empty-lines": [1, { "max": 2, "maxBOF": 0, "maxEOF": 0}],
     "padded-blocks": 1,
     "prefer-destructuring": 1,
-    "max-len": [1, { "ignoreComments": true }],
+    "max-len": [0, { "ignoreComments": true }],
     "consistent-return": 1
 
   }
