@@ -149,12 +149,13 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Используем классы для карточек меню
   class MenuCard {
-    constructor(src, alt, title, descr, price, parentSelector) {
+    constructor(src, alt, title, descr, price, parentSelector, ...classes) {
       this.src = src;
       this.alt = alt;
       this.title = title;
       this.descr = descr;
       this.price = price;
+      this.classes = classes; // Здесь массив
       this.parent = document.querySelector(parentSelector); // Находит элемент, переданный в аргементе parentSelector
       // this.transfer = 60; // Курс доллара
       // this.changeToRUB(); // Прямо здесь вызывает метод changeToRUB и переводит доллары в рубли
@@ -166,30 +167,29 @@ window.addEventListener('DOMContentLoaded', () => {
 
     render() { // Создает элемент на странице
       const element = document.createElement('div'); // тег div
-      element.classList.add('menu__item'); // класс menu__item
-      this.parent.append(element); // Вставить внутри parentSelector в конце
+
+      if (this.classes.length === 0) { // Если в параметрах не переданы классы, то задает по умолчанию .menu__item
+        this.element = 'menu__item';
+        element.classList.add(this.element);
+      } else {
+        this.classes.forEach((className) => { // Добавляет в div классы из массива
+          element.classList.add(className);
+        });
+      }
+
+      this.parent.append(element); // Вставить внутри parentSelector после остальных блоков
 
       element.innerHTML = `
-      <img src="${this.src}" alt="${this.alt}">
+      <img src=${this.src} alt=${this.alt}>
       <h3 class="menu__item-subtitle">${this.title}</h3>
       <div class="menu__item-descr">${this.descr}</div>
       <div class="menu__item-divider"></div>
       <div class="menu__item-price">
           <div class="menu__item-cost">Цена:</div>
           <div class="menu__item-total"><span>${this.price}</span> руб/день</div>
-      `; // Можно не ставить кавычки для src и alt, html сам их подставит, но не должно тогда быть пробелов
+      `; // Можно не ставить кавычки для src и alt, html сам их подставит, но не должно быть пробелов
     }
   }
-
-  // new MenuCard( //
-  //   'img/tabs/chips.webp',
-  //   'chips',
-  //   'Меню "Чипсы"',
-  //   'Чипсы хороши всегда, просто берёшь и кушаешь, очень вкусно и хрустит, желательно употреблять с большим количеством пива!',
-  //   20,
-  //   '.menu .container',
-  // ).render();
-
 
   new MenuCard( // Создает объект из данных и сразу на него вызывает метод render
     'img/tabs/vegy.jpg',
@@ -198,6 +198,7 @@ window.addEventListener('DOMContentLoaded', () => {
     'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
     229,
     '.menu .container',
+    'menu__item',
   ).render();
 
   new MenuCard(
@@ -207,6 +208,7 @@ window.addEventListener('DOMContentLoaded', () => {
     'В меню "Премиум" мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
     550,
     '.menu .container',
+    'menu__item',
   ).render();
 
   new MenuCard(
@@ -216,6 +218,7 @@ window.addEventListener('DOMContentLoaded', () => {
     'Меню "Постное" - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
     430,
     '.menu .container',
+    'menu__item',
   ).render();
 
 
