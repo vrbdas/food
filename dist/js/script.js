@@ -86,7 +86,14 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  const deadline = new Date(Date.parse(new Date()) + 5 * 24 * 60 * 60 * 1000); // Добавляет всегда 5 дней к текущей дате
+  function randomInteger(min, max) { // Случайное целое число от min до max
+    let rand = min + Math.random() * (max + 1 - min);
+    return Math.floor(rand);
+  }
+
+  // const deadline = new Date(Date.parse(new Date()) + 5 * 24 * 60 * 60 * 1000); // Добавляет всегда 5 дней к текущей дате
+  const deadline = new Date(Date.parse(new Date()) + randomInteger((1 * 24 * 60 * 60 * 1000), (3 * 24 * 60 * 60 * 1000))); // Добавляет случайное количество дней от 1 до 3 к текущей дате
+
   setClock('.timer', deadline);
 
   // Модальное окно
@@ -104,7 +111,7 @@ window.addEventListener('DOMContentLoaded', () => {
   function modalHide() {
     modal.classList.add('hide');
     modal.classList.remove('show');
-    document.body.style.overflow = ''; // Возвращает прокрутку страницы
+    document.body.style.overflow = ''; // Возвращает прокрутку страницы, когда закрыто модальное окно
   }
 
   modalTrigger.forEach((item) => { // Показавает окно при клике на кнопки 'Связаться с нами'
@@ -137,5 +144,82 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  window.addEventListener('scroll', showModalByScroll); // Показывает окно при прокрутке страницы до самого конца
+  // window.addEventListener('scroll', showModalByScroll); // Показывает окно при прокрутке страницы до самого конца
+
+
+  // Используем классы для карточек меню
+  class MenuCard {
+    constructor(src, alt, title, descr, price, parentSelector) {
+      this.src = src;
+      this.alt = alt;
+      this.title = title;
+      this.descr = descr;
+      this.price = price;
+      this.parent = document.querySelector(parentSelector); // Находит элемент, переданный в аргементе parentSelector
+      // this.transfer = 60; // Курс доллара
+      // this.changeToRUB(); // Прямо здесь вызывает метод changeToRUB и переводит доллары в рубли
+    }
+
+    // changeToRUB() { // Перевод валюты из долларов в рубли
+    //   this.price *= this.transfer;
+    // }
+
+    render() { // Создает элемент на странице
+      const element = document.createElement('div'); // тег div
+      element.classList.add('menu__item'); // класс menu__item
+      this.parent.append(element); // Вставить внутри parentSelector в конце
+
+      element.innerHTML = `
+      <img src="${this.src}" alt="${this.alt}">
+      <h3 class="menu__item-subtitle">${this.title}</h3>
+      <div class="menu__item-descr">${this.descr}</div>
+      <div class="menu__item-divider"></div>
+      <div class="menu__item-price">
+          <div class="menu__item-cost">Цена:</div>
+          <div class="menu__item-total"><span>${this.price}</span> руб/день</div>
+      `; // Можно не ставить кавычки для src и alt, html сам их подставит, но не должно тогда быть пробелов
+    }
+  }
+
+  // new MenuCard( //
+  //   'img/tabs/chips.webp',
+  //   'chips',
+  //   'Меню "Чипсы"',
+  //   'Чипсы хороши всегда, просто берёшь и кушаешь, очень вкусно и хрустит, желательно употреблять с большим количеством пива!',
+  //   20,
+  //   '.menu .container',
+  // ).render();
+
+
+  new MenuCard( // Создает объект из данных и сразу на него вызывает метод render
+    'img/tabs/vegy.jpg',
+    'vegy',
+    'Меню "Фитнес"',
+    'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
+    229,
+    '.menu .container',
+  ).render();
+
+  new MenuCard(
+    'img/tabs/elite.jpg',
+    'elite',
+    'Меню "Премиум"',
+    'В меню "Премиум" мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
+    550,
+    '.menu .container',
+  ).render();
+
+  new MenuCard(
+    'img/tabs/post.jpg',
+    'post',
+    'Меню "Постное"',
+    'Меню "Постное" - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
+    430,
+    '.menu .container',
+  ).render();
+
+
+
+
+
 });

@@ -52,7 +52,10 @@
     "padded-blocks": 1,
     "prefer-destructuring": 1,
     "max-len": [0, { "ignoreComments": true }],
-    "consistent-return": 1
+    "consistent-return": 1,
+    "no-useless-constructor": 1,
+    "max-classes-per-file": 0,
+    "lines-between-class-members": 1
 
   }
 }
