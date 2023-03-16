@@ -222,7 +222,67 @@ window.addEventListener('DOMContentLoaded', () => {
   ).render();
 
 
+  // Forms
 
+  const forms = document.querySelectorAll('form');
+
+  const message = {
+    loading: 'Загрузка',
+    success: 'Спасибо! Скоро мы с вами свяжемся',
+    failure: 'Что-то пошло не так...',
+  };
+
+  forms.forEach((item) => { // На каждую форму вешает обработчик формы
+    postData(item);
+  });
+
+  function postData(form) {
+    form.addEventListener('submit', (event) => { // Событие отправка формы кликом на кнопку или enter
+      event.preventDefault();
+
+      const statusMessage = document.createElement('div'); // К форме добавляется блок с сообщениями о статусе отправки
+      statusMessage.classList.add('status');
+      statusMessage.textContent = message.loading;
+      form.append(statusMessage);
+
+      const request = new XMLHttpRequest(); // Создает запрос для отправки данных на сервер
+      request.open('POST', 'server.php'); // Метод запроса и url сервера
+
+      request.setRequestHeader('Content-type', 'application/json'); // Заголовок, первый аттрибут это имя, второй значение
+      // ДЛЯ XMLHttpRequest + FormData ЗАГОЛОВОК СТАВИТЬ НЕ НУЖНО!
+
+      const formData = new FormData(form); // Данные из формы, во всех input обязательно должны быть аттрибуты name=""
+
+      const object = {};
+      formData.forEach(function(value, key) { // Преобразовывает formdata в обычный объект
+        object[key] = value;
+      });
+
+      const json = JSON.stringify(object); // Преобразовывает объект в JSON
+
+      request.send(json); // Отправляет запрос, в скобках тело запроса
+
+      request.addEventListener('load', () => { // load значит, что запрос полностью загрузился на сервер
+        if (request.status === 200) { // Код ответа от сервера, HTTP 200 значит успешно
+          console.log(request.response); // Ответ от сервера
+          statusMessage.textContent = message.success;
+          form.reset();
+          setTimeout(() => {
+            statusMessage.remove();
+          }, 2000);
+        } else {
+          statusMessage.textContent = message.failure;
+        }
+      });
+    });
+  }
+
+  // function showThanksModal() {
+  //   const prevModalDialog = document.querySelector('.modal__dialog');
+  //   prevModalDialog.classList.add('hide');
+
+  //   const thanksModal = document.createElement('')
+  // }
 
 
 });

@@ -44,7 +44,7 @@
     "no-new-wrappers": 1,
     "object-shorthand": 1,
     "quotes": [1, "single", { "allowTemplateLiterals": true }],
-    "arrow-parens": [2, "always"],
+    "arrow-parens": [1, "always"],
     "no-param-reassign": [2, { "props": false }],
     "func-names": 0,
     "no-trailing-spaces": 1,
@@ -55,7 +55,8 @@
     "consistent-return": 1,
     "no-useless-constructor": 1,
     "max-classes-per-file": 0,
-    "lines-between-class-members": 1
+    "lines-between-class-members": 1,
+    "comma-dangle": 1
 
   }
 }
