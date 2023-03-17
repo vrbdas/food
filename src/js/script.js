@@ -99,7 +99,6 @@ window.addEventListener('DOMContentLoaded', () => {
   // Модальное окно
   const modalTrigger = document.querySelectorAll('[data-modal]');
   const modal = document.querySelector('.modal'); // Изначально стоит класс .hide
-  const modalClose = document.querySelectorAll('[data-close]');
 
   function modalShow() {
     modal.classList.add('show'); // display: block;
@@ -118,12 +117,9 @@ window.addEventListener('DOMContentLoaded', () => {
     item.addEventListener('click', modalShow);
   });
 
-  modalClose.forEach((item) => { // Закрывает окно при клике на крестик
-    item.addEventListener('click', modalHide);
-  });
 
-  modal.addEventListener('click', (event) => { // Закрывает окно при клике на область вокруг .modal__dialog
-    if (event.target === modal) {
+  modal.addEventListener('click', (event) => { // Закрывает окно при клике на область вокруг .modal__dialog или на крестик
+    if (event.target === modal || event.target.matches('[data-close]')) {
       modalHide();
     }
   });
@@ -226,12 +222,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const forms = document.querySelectorAll('form');
 
-  const message = {
-    loading: 'Загрузка',
-    success: 'Спасибо! Скоро мы с вами свяжемся',
-    failure: 'Что-то пошло не так...',
-  };
-
   forms.forEach((item) => { // На каждую форму вешает обработчик формы
     postData(item);
   });
@@ -240,10 +230,13 @@ window.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', (event) => { // Событие отправка формы кликом на кнопку или enter
       event.preventDefault();
 
-      const statusMessage = document.createElement('div'); // К форме добавляется блок с сообщениями о статусе отправки
-      statusMessage.classList.add('status');
-      statusMessage.textContent = message.loading;
-      form.append(statusMessage);
+      const statusMessage = document.createElement('img'); // К форме добавляется блок с сообщениями о статусе отправки
+      statusMessage.setAttribute('src', 'img/form/spinner.svg');
+      statusMessage.style.cssText = `
+        display: block;
+        margin: 0 auto;
+      `;
+      form.insertAdjacentElement('afterend', statusMessage); // При загрузке показывает спиннер после формы
 
       const request = new XMLHttpRequest(); // Создает запрос для отправки данных на сервер
       request.open('POST', 'server.php'); // Метод запроса и url сервера
@@ -265,24 +258,36 @@ window.addEventListener('DOMContentLoaded', () => {
       request.addEventListener('load', () => { // load значит, что запрос полностью загрузился на сервер
         if (request.status === 200) { // Код ответа от сервера, HTTP 200 значит успешно
           console.log(request.response); // Ответ от сервера
-          statusMessage.textContent = message.success;
+          showThanksModal('Спасибо! Скоро мы с вами свяжемся');
           form.reset();
-          setTimeout(() => {
-            statusMessage.remove();
-          }, 2000);
+          statusMessage.remove(); // Удаляет спиннер загрузки
         } else {
-          statusMessage.textContent = message.failure;
+          showThanksModal('Что-то пошло не так...');
         }
       });
     });
   }
 
-  // function showThanksModal() {
-  //   const prevModalDialog = document.querySelector('.modal__dialog');
-  //   prevModalDialog.classList.add('hide');
+  function showThanksModal(text) { // Меняет модальное окно на сообщение об отправке
+    const formModalDialog = document.querySelector('.modal__dialog');
 
-  //   const thanksModal = document.createElement('')
-  // }
+    formModalDialog.classList.add('hide'); // Скрывает внутреннюю часть старого окна
+    modalShow();
 
-
+    const thanksModalDialog = document.createElement('div');
+    thanksModalDialog.classList.add('modal__dialog');
+    thanksModalDialog.innerHTML = `
+    <div class="modal__content">
+      <div data-close class="modal__close">&times;</div>
+      <div class="modal__title">${text}</div>
+    </div>
+    `;
+    modal.append(thanksModalDialog); // Вставляет новую внутреннюю часть
+    setTimeout(() => { // Через 4с скрывает окно и возвращает внутреннюю часть с формой
+      thanksModalDialog.remove();
+      formModalDialog.classList.remove('hide');
+      formModalDialog.classList.add('show');
+      modalHide();
+    }, 4000);
+  }
 });
