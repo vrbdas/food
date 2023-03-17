@@ -238,12 +238,6 @@ window.addEventListener('DOMContentLoaded', () => {
       `;
       form.insertAdjacentElement('afterend', statusMessage); // При загрузке показывает спиннер после формы
 
-      const request = new XMLHttpRequest(); // Создает запрос для отправки данных на сервер
-      request.open('POST', 'server.php'); // Метод запроса и url сервера
-
-      request.setRequestHeader('Content-type', 'application/json'); // Заголовок, первый аттрибут это имя, второй значение
-      // ДЛЯ XMLHttpRequest + FormData ЗАГОЛОВОК СТАВИТЬ НЕ НУЖНО!
-
       const formData = new FormData(form); // Данные из формы, во всех input обязательно должны быть аттрибуты name=""
 
       const object = {};
@@ -251,20 +245,23 @@ window.addEventListener('DOMContentLoaded', () => {
         object[key] = value;
       });
 
-      const json = JSON.stringify(object); // Преобразовывает объект в JSON
-
-      request.send(json); // Отправляет запрос, в скобках тело запроса
-
-      request.addEventListener('load', () => { // load значит, что запрос полностью загрузился на сервер
-        if (request.status === 200) { // Код ответа от сервера, HTTP 200 значит успешно
-          console.log(request.response); // Ответ от сервера
+      fetch('server.php', { // Запрос на сервер, при методе fetch ответ приходит в виде promise
+        method: 'POST', // POST это отправка, GET получение
+        headers: {'Content-type': 'application/json'}, // Заголовки нужны для JSON, если на сервер отправлять formData, то не нужны
+        body: JSON.stringify(object), // Тело запроса, если запрос GET, то не нужно. Stringify преобразовывает объект в JSON
+      })
+        .then((data) => data.text()) // В однострочной стрелочной функции return это правая часть
+        .then((data) => { // Обработка успешного promise
+          console.log(data); // Ответ от сервера
           showThanksModal('Спасибо! Скоро мы с вами свяжемся');
-          form.reset();
           statusMessage.remove(); // Удаляет спиннер загрузки
-        } else {
+        })
+        .catch(() => { // Обработка reject (ошибки)
           showThanksModal('Что-то пошло не так...');
-        }
-      });
+        })
+        .finally(() => { // Выполнится в любом случае
+          form.reset(); // Очистка формы
+        });
     });
   }
 
@@ -290,4 +287,19 @@ window.addEventListener('DOMContentLoaded', () => {
       modalHide();
     }, 4000);
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 });

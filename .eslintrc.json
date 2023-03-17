@@ -22,7 +22,7 @@
     "no-unused-expressions": 1,
     "no-nested-ternary": 1,
     "no-restricted-globals": 1,
-    "eol-last": 1,
+    "eol-last": 0,
     "prefer-arrow-callback": 0,
     "dot-notation": 1,
     "no-else-return": 1,
@@ -49,14 +49,17 @@
     "func-names": 0,
     "no-trailing-spaces": 1,
     "no-multiple-empty-lines": [1, { "max": 2, "maxBOF": 0, "maxEOF": 0}],
-    "padded-blocks": 1,
+    "padded-blocks": 0,
     "prefer-destructuring": 1,
     "max-len": [0, { "ignoreComments": true }],
     "consistent-return": 1,
     "no-useless-constructor": 1,
     "max-classes-per-file": 0,
     "lines-between-class-members": 1,
-    "comma-dangle": 1
-
+    "comma-dangle": 1,
+    "arrow-body-style": 0,
+    "prefer-promise-reject-errors": 0,
+    "newline-per-chained-call": 1,
+    "indent": 1
   }
 }
