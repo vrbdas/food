@@ -50,7 +50,7 @@
     "no-trailing-spaces": 1,
     "no-multiple-empty-lines": [0, { "max": 2, "maxBOF": 0, "maxEOF": 0}],
     "padded-blocks": 0,
-    "prefer-destructuring": 1,
+    "prefer-destructuring": 0,
     "max-len": [0, { "ignoreComments": true }],
     "consistent-return": 1,
     "no-useless-constructor": 1,

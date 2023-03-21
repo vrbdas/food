@@ -59,3 +59,110 @@ getResource('http://localhost:3000/menu')
       new MenuCard(img, altimg, title, descr, price, '.menu .container').render(); // Создает объект из данных и сразу на него вызывает метод render
     });
   });
+
+
+
+// Самодельный слайдер
+
+const slider = document.querySelector('.offer__slider');
+const current = document.querySelector('#current');
+const total = document.querySelector('#total');
+
+function leftOut(num) {
+  let i = 0;
+  setInterval(transform, 5);
+  function transform() {
+    if (i === 100) {
+      clearInterval();
+    } else {
+      i += 1;
+      slides[num].style.transform = `translateX(${-i}%)`;
+    }
+  }
+}
+
+function rightIn(num) {
+  let i = 100;
+  setInterval(transform, 5);
+  function transform() {
+    if (i === 0) {
+      clearInterval();
+    } else {
+      i -= 1;
+      slides[num].style.transform = `translateX(${i}%)`;
+    }
+  }
+}
+
+function rightOut(num) {
+  let i = 0;
+  setInterval(transform, 5);
+  function transform() {
+    if (i === 100) {
+      clearInterval();
+    } else {
+      i += 1;
+      slides[num].style.transform = `translateX(${i}%)`;
+    }
+  }
+}
+
+function leftIn(num) {
+  let i = -100;
+  setInterval(transform, 5);
+  function transform() {
+    if (i === 0) {
+      clearInterval();
+    } else {
+      i += 1;
+      slides[num].style.transform = `translateX(${i}%)`;
+    }
+  }
+}
+
+let slides;
+
+getResource('http://localhost:3000/slides')
+  .then((data) => createSlide(data));
+
+function createSlide(data) {
+  data.forEach(({img, altimg}) => {
+    const slide = document.createElement('div');
+    slide.classList.add('offer__slide');
+    slide.innerHTML = `<img src=${img} alt=${altimg}>`;
+    document.querySelector('.offer__slider-wrapper').append(slide);
+    slide.style.transform = `translateX(-100%)`;
+  });
+
+  slides = document.querySelectorAll('.offer__slide');
+  current.textContent = '01';
+  total.textContent = getZero(slides.length);
+  slides[0].style.transform = `translateX(0)`;
+}
+
+let slideIndex = 0;
+
+slider.addEventListener('click', (event) => {
+  if (event.target && event.target.matches('.offer__slider-next, .offer__slider-next *')) {
+    slideIndex += 1;
+    if (slideIndex > slides.length - 1) {
+      slideIndex = 0;
+      leftOut(slides.length - 1);
+      rightIn(slideIndex);
+    } else if (slideIndex <= slides.length - 1) {
+      leftOut(slideIndex - 1);
+      rightIn(slideIndex);
+    }
+  } else if (event.target && event.target.matches('.offer__slider-prev, .offer__slider-prev *')) {
+    slideIndex -= 1;
+    if (slideIndex < 0) {
+      slideIndex = slides.length - 1;
+      rightOut(0);
+      leftIn(slideIndex);
+    } else if (slideIndex >= 0) {
+      rightOut(slideIndex + 1);
+      leftIn(slideIndex);
+    }
+  }
+  current.textContent = getZero(slideIndex + 1);
+});
