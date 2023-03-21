@@ -48,7 +48,7 @@
     "no-param-reassign": [2, { "props": false }],
     "func-names": 0,
     "no-trailing-spaces": 1,
-    "no-multiple-empty-lines": [1, { "max": 2, "maxBOF": 0, "maxEOF": 0}],
+    "no-multiple-empty-lines": [0, { "max": 2, "maxBOF": 0, "maxEOF": 0}],
     "padded-blocks": 0,
     "prefer-destructuring": 1,
     "max-len": [0, { "ignoreComments": true }],
@@ -60,6 +60,8 @@
     "arrow-body-style": 0,
     "prefer-promise-reject-errors": 0,
     "newline-per-chained-call": 1,
-    "indent": 1
+    "indent": 1,
+    "no-return-await": 0,
+    "object-curly-newline": 1
   }
 }

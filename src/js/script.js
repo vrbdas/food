@@ -26,11 +26,10 @@ window.addEventListener('DOMContentLoaded', () => {
   showTabContent(); // Показывает первую вкладку по умолчанию (i = 0 в функции showTabContent)
 
   tabHeaderContainer.addEventListener('click', (event) => { // Обрабатывает клик на контейнер с вкладками
-    const target = event.target;
 
-    if (target && target.matches('.tabheader__item')) { // Проверяет клик на вкладку
+    if (event.target && event.target.matches('.tabheader__item')) { // Проверяет клик на вкладку
       tabHeaderItems.forEach((item, i) => { // Определяет номер вкладки
-        if (item === target) {
+        if (item === event.target) {
           hideTabContent();
           showTabContent(i);
         }
@@ -87,11 +86,10 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   function randomInteger(min, max) { // Случайное целое число от min до max
-    let rand = min + Math.random() * (max + 1 - min);
+    const rand = min + Math.random() * (max + 1 - min);
     return Math.floor(rand);
   }
 
-  // const deadline = new Date(Date.parse(new Date()) + 5 * 24 * 60 * 60 * 1000); // Добавляет всегда 5 дней к текущей дате
   const deadline = new Date(Date.parse(new Date()) + randomInteger((1 * 24 * 60 * 60 * 1000), (3 * 24 * 60 * 60 * 1000))); // Добавляет случайное количество дней от 1 до 3 к текущей дате
 
   setClock('.timer', deadline);
@@ -104,7 +102,7 @@ window.addEventListener('DOMContentLoaded', () => {
     modal.classList.add('show'); // display: block;
     modal.classList.remove('hide'); // display: none;
     document.body.style.overflow = 'hidden'; // Предотвращает прокрутку страницы, когда открыто модальное окно
-    // clearInterval(modalTimerId); // Предотвращает открытие окна по таймеру, если уже открывали вручную
+    clearInterval(modalTimerId); // Предотвращает открытие окна по таймеру, если уже открывали вручную
   }
 
   function modalHide() {
@@ -130,7 +128,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // const modalTimerId = setTimeout(modalShow, 30000); // Автоматически открывает модальное окно по таймеру
+  const modalTimerId = setTimeout(modalShow, 900000); // Автоматически открывает модальное окно по таймеру через 15 мин
 
   function showModalByScroll() {
     if (document.documentElement.scrollTop + 1 + document.documentElement.clientHeight >= document.documentElement.scrollHeight) { // document.documentElement это <html></html>
@@ -140,93 +138,60 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // window.addEventListener('scroll', showModalByScroll); // Показывает окно при прокрутке страницы до самого конца
+  window.addEventListener('scroll', showModalByScroll); // Показывает окно при прокрутке страницы до самого конца
 
+  // Создание карточек меню
 
-  // Используем классы для карточек меню
-  class MenuCard {
-    constructor(src, alt, title, descr, price, parentSelector, ...classes) {
-      this.src = src;
-      this.alt = alt;
-      this.title = title;
-      this.descr = descr;
-      this.price = price;
-      this.classes = classes; // Здесь массив
-      this.parent = document.querySelector(parentSelector); // Находит элемент, переданный в аргементе parentSelector
-      // this.transfer = 60; // Курс доллара
-      // this.changeToRUB(); // Прямо здесь вызывает метод changeToRUB и переводит доллары в рубли
+  const getResource = async(url) => { // Настраивает и посылает запрос на сервер
+    const result = await fetch(url); // Fetch возвращает promise
+
+    if (!result.ok) {
+      throw new Error(`Could not fetch ${url}, status: ${result.status}`); // Создает объект ошибки и выбрасывает его как исключение
     }
 
-    // changeToRUB() { // Перевод валюты из долларов в рубли
-    //   this.price *= this.transfer;
-    // }
+    return await result.json(); // Promise в формате JSON
+  };
 
-    render() { // Создает элемент на странице
-      const element = document.createElement('div'); // тег div
+  getResource('http://localhost:3000/menu')
+    .then((data) => createCard(data));
 
-      if (this.classes.length === 0) { // Если в параметрах не переданы классы, то задает по умолчанию .menu__item
-        this.element = 'menu__item';
-        element.classList.add(this.element);
-      } else {
-        this.classes.forEach((className) => { // Добавляет в div классы из массива
-          element.classList.add(className);
-        });
-      }
-
-      this.parent.append(element); // Вставить внутри parentSelector после остальных блоков
-
+  function createCard(data) {
+    data.forEach(({img, altimg, title, descr, price}) => { // Для каждого объекта из массива menu разбивает его на значения и они присваиваются переменным с таким же именем
+      const element = document.createElement('div');
+      element.classList.add('menu__item');
       element.innerHTML = `
-      <img src=${this.src} alt=${this.alt}>
-      <h3 class="menu__item-subtitle">${this.title}</h3>
-      <div class="menu__item-descr">${this.descr}</div>
-      <div class="menu__item-divider"></div>
-      <div class="menu__item-price">
-          <div class="menu__item-cost">Цена:</div>
-          <div class="menu__item-total"><span>${this.price}</span> руб/день</div>
-      `; // Можно не ставить кавычки для src и alt, html сам их подставит, но не должно быть пробелов
-    }
+        <img src=${img} alt=${altimg}>
+        <h3 class="menu__item-subtitle">${title}</h3>
+        <div class="menu__item-descr">${descr}</div>
+        <div class="menu__item-divider"></div>
+        <div class="menu__item-price">
+        <div class="menu__item-cost">Цена:</div>
+        <div class="menu__item-total"><span>${price}</span> руб/день</div>
+        `; // Можно не ставить кавычки для src и alt, html сам их подставит, но не должно быть пробелов
+
+      document.querySelector('.menu .container').append(element);
+    });
   }
 
-  new MenuCard( // Создает объект из данных и сразу на него вызывает метод render
-    'img/tabs/vegy.jpg',
-    'vegy',
-    'Меню "Фитнес"',
-    'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-    229,
-    '.menu .container',
-    'menu__item',
-  ).render();
-
-  new MenuCard(
-    'img/tabs/elite.jpg',
-    'elite',
-    'Меню "Премиум"',
-    'В меню "Премиум" мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-    550,
-    '.menu .container',
-    'menu__item',
-  ).render();
-
-  new MenuCard(
-    'img/tabs/post.jpg',
-    'post',
-    'Меню "Постное"',
-    'Меню "Постное" - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-    430,
-    '.menu .container',
-    'menu__item',
-  ).render();
-
-
-  // Forms
+  // Формы
 
   const forms = document.querySelectorAll('form');
 
   forms.forEach((item) => { // На каждую форму вешает обработчик формы
-    postData(item);
+    bindPostData(item);
   });
 
-  function postData(form) {
+  const postData = async(url, data) => { // Настраивает и посылает запрос на сервер
+    const result = await fetch(url, { // await дождется результата фукции fetch
+      method: 'POST', // POST это отправка, GET получение
+      headers: {'Content-type': 'application/json'}, // Заголовки нужны для JSON, если на сервер отправлять formData, то не нужны
+      body: data, // Тело запроса, если запрос GET, то не нужно
+    });
+
+    return await result.json(); // Ответ от сервера в виде PROMISE в формате JSON
+  };
+
+  function bindPostData(form) {
     form.addEventListener('submit', (event) => { // Событие отправка формы кликом на кнопку или enter
       event.preventDefault();
 
@@ -240,17 +205,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
       const formData = new FormData(form); // Данные из формы, во всех input обязательно должны быть аттрибуты name=""
 
-      const object = {};
-      formData.forEach(function(value, key) { // Преобразовывает formdata в обычный объект
-        object[key] = value;
-      });
+      const json = JSON.stringify(Object.fromEntries(formData.entries())); // Данные из формы превращает в массив массивов, его в обычный объект, а его в JSON
 
-      fetch('server.php', { // Запрос на сервер, при методе fetch ответ приходит в виде promise
-        method: 'POST', // POST это отправка, GET получение
-        headers: {'Content-type': 'application/json'}, // Заголовки нужны для JSON, если на сервер отправлять formData, то не нужны
-        body: JSON.stringify(object), // Тело запроса, если запрос GET, то не нужно. Stringify преобразовывает объект в JSON
-      })
-        .then((data) => data.text()) // В однострочной стрелочной функции return это правая часть
+      postData('http://localhost:3000/requests', json)
         .then((data) => { // Обработка успешного promise
           console.log(data); // Ответ от сервера
           showThanksModal('Спасибо! Скоро мы с вами свяжемся');
@@ -288,18 +245,110 @@ window.addEventListener('DOMContentLoaded', () => {
     }, 4000);
   }
 
+  // Слайдер
 
+  const slider = document.querySelector('.offer__slider');
+  const current = document.querySelector('#current');
+  const total = document.querySelector('#total');
 
+  function leftOut(num) {
+    let i = 0;
+    setInterval(transform, 5);
+    function transform() {
+      if (i === 100) {
+        clearInterval();
+      } else {
+        i += 1;
+        slides[num].style.transform = `translateX(${-i}%)`;
+      }
+    }
+  }
 
+  function rightIn(num) {
+    let i = 100;
+    setInterval(transform, 5);
+    function transform() {
+      if (i === 0) {
+        clearInterval();
+      } else {
+        i -= 1;
+        slides[num].style.transform = `translateX(${i}%)`;
+      }
+    }
+  }
 
+  function rightOut(num) {
+    let i = 0;
+    setInterval(transform, 5);
+    function transform() {
+      if (i === 100) {
+        clearInterval();
+      } else {
+        i += 1;
+        slides[num].style.transform = `translateX(${i}%)`;
+      }
+    }
+  }
 
+  function leftIn(num) {
+    let i = -100;
+    setInterval(transform, 5);
+    function transform() {
+      if (i === 0) {
+        clearInterval();
+      } else {
+        i += 1;
+        slides[num].style.transform = `translateX(${i}%)`;
+      }
+    }
+  }
 
+  let slides;
 
+  getResource('http://localhost:3000/slides')
+    .then((data) => createSlide(data));
 
+  function createSlide(data) {
+    data.forEach(({img, altimg}) => {
+      const slide = document.createElement('div');
+      slide.classList.add('offer__slide');
+      slide.innerHTML = `<img src=${img} alt=${altimg}>`;
+      document.querySelector('.offer__slider-wrapper').append(slide);
+      slide.style.transform = `translateX(-100%)`;
+    });
 
+    slides = document.querySelectorAll('.offer__slide');
+    current.textContent = '01';
+    total.textContent = getZero(slides.length);
+    slides[0].style.transform = `translateX(0)`;
+  }
 
+  let slideIndex = 0;
 
-
+  slider.addEventListener('click', (event) => {
+    if (event.target && event.target.matches('.offer__slider-next, .offer__slider-next *')) {
+      slideIndex += 1;
+      if (slideIndex > slides.length - 1) {
+        slideIndex = 0;
+        leftOut(slides.length - 1);
+        rightIn(slideIndex);
+      } else if (slideIndex <= slides.length - 1) {
+        leftOut(slideIndex - 1);
+        rightIn(slideIndex);
+      }
+    } else if (event.target && event.target.matches('.offer__slider-prev, .offer__slider-prev *')) {
+      slideIndex -= 1;
+      if (slideIndex < 0) {
+        slideIndex = slides.length - 1;
+        rightOut(0);
+        leftIn(slideIndex);
+      } else if (slideIndex >= 0) {
+        rightOut(slideIndex + 1);
+        leftIn(slideIndex);
+      }
+    }
+    current.textContent = getZero(slideIndex + 1);
+  });
 
 
 });

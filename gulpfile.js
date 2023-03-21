@@ -16,6 +16,7 @@ gulp.task('watch', function() {
     gulp.watch("src/*.html").on('change', gulp.parallel('html'));
     gulp.watch("src/js/**/*.js").on('change', gulp.parallel('scripts'));
     gulp.watch("src/fonts/**/*").on('all', gulp.parallel('fonts'));
+    gulp.watch("src/php/*.php").on('change', gulp.parallel('php'));
     gulp.watch("src/icons/**/*").on('all', gulp.parallel('icons'));
     gulp.watch("src/img/**/*").on('all', gulp.parallel('images'));
 });
@@ -35,6 +36,11 @@ gulp.task('fonts', function () {
         .pipe(gulp.dest("C:/program files/ospanel/domains/Food/fonts"))
 });
 
+gulp.task('php', function () {
+    return gulp.src("src/php/**/*.php")
+        .pipe(gulp.dest("C:/program files/ospanel/domains/Food/php"))
+});
+
 gulp.task('icons', function () {
     return gulp.src("src/icons/**/*")
         .pipe(gulp.dest("C:/program files/ospanel/domains/Food/icons"))
@@ -45,4 +51,4 @@ gulp.task('images', function () {
         .pipe(gulp.dest("C:/program files/ospanel/domains/Food/img"))
 });
 
-gulp.task('default', gulp.parallel('styles', 'watch', 'html', 'scripts', 'fonts', 'icons',  'images'));
+gulp.task('default', gulp.parallel('styles', 'watch', 'html', 'scripts', 'fonts', 'php', 'icons',  'images'));
