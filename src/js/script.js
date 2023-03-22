@@ -245,73 +245,85 @@ window.addEventListener('DOMContentLoaded', () => {
     }, 4000);
   }
 
-  // Слайдер
+  // Самодельный слайдер
 
-  const slides = document.querySelectorAll('.offer__slide');
-  const prev = document.querySelector('.offer__slider-prev');
-  const next = document.querySelector('.offer__slider-next');
+  const slider = document.querySelector('.offer__slider');
   const current = document.querySelector('#current');
   const total = document.querySelector('#total');
-  const slidesWrapper = document.querySelector('.offer__slider-wrapper');
-  const slidesField = document.querySelector('.offer__slider-inner');
-  const width = window.getComputedStyle(slidesWrapper).width;
+  const inner = document.querySelector('.offer__slider-inner');
+  const wrapper = document.querySelector('.offer__slider-wrapper');
+  const slides = document.querySelectorAll('.offer__slide');
+  const images = document.querySelectorAll('.offer__slide img');
 
-  let slideIndex = 1;
-  let offset = 0;
+  const wrapperWidth = parseInt(window.getComputedStyle(wrapper).width, 10);
+  let slideIndex = 0;
+  inner.style.width = `${wrapperWidth * slides.length}px`;
+  current.textContent = getZero(slideIndex + 1);
+  total.textContent = getZero(slides.length);
 
-  if (slides.length < 10) {
-    total.textContent = `0${slides.length}`; // Добавляет ноль если одна цифра
-    current.textContent = `0${slideIndex}`;
-  } else {
-    total.textContent = slides.length;
-    current.textContent = slideIndex;
+  slider.addEventListener('click', (event) => {
+    if (event.target && event.target.matches('.offer__slider-next, .offer__slider-next *')) {
+      slideIndex += 1;
+      if (slideIndex > slides.length - 1) {
+        slideIndex -= 1; // Можно поставить 0 - возвращает на первый слайд
+      }
+    } else if (event.target && event.target.matches('.offer__slider-prev, .offer__slider-prev *')) {
+      slideIndex -= 1;
+      if (slideIndex < 0) {
+        slideIndex += 1; // Можно поставить = slides.length - 1 - возвращает на последний слайд
+      }
+    }
+    inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`;
+    current.textContent = getZero(slideIndex + 1);
+  });
+
+  // Свайпы для слайдера
+
+  images.forEach((item) => {
+    item.addEventListener('mousedown', handleTouchStart);
+    item.addEventListener('mousemove', handleTouchMove);
+    item.ondragstart = function() { // Отключает встроенное в браузер перетаскивание картинки
+      return false;
+    };
+  });
+
+  let xDown = null;
+  let yDown = null;
+
+  function handleTouchStart(evt) { // прикосновение
+    xDown = evt.clientX;
+    yDown = evt.clientY;
   }
 
-  slidesField.style.width = `${100 * slides.length}%`;
-
-  next.addEventListener('click', () => {
-    if (offset === +width.slice(0, width.length - 2) * (slides.length - 1)) { // 650 * 3 дошли до последнего слайда
-      offset = 0; // Возвращаемся к первому
-    } else {
-      offset += +width.slice(0, width.length - 2); // Смещает слайдер на 650px вправо
+  function handleTouchMove(evt) { // движение пальцем по экрану
+    if (!xDown || !yDown) {
+      return;
     }
 
-    slidesField.style.transform = `translateX(-${offset}px)`;
+    const xUp = evt.clientX;
+    const yUp = evt.clientY;
 
-    if (slideIndex === slides.length) {
-      slideIndex = 1;
-    } else {
-      slideIndex += 1;
+    const xDiff = xDown - xUp;
+    const yDiff = yDown - yUp;
+
+    if (Math.abs(xDiff) > Math.abs(yDiff)) {
+      if (xDiff > 0) {
+        slideIndex += 1;
+        if (slideIndex > slides.length - 1) {
+          slideIndex -= 1;
+        }
+      } else {
+        slideIndex -= 1;
+        if (slideIndex < 0) {
+          slideIndex += 1;
+        }
+      }
+      inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`;
+      current.textContent = getZero(slideIndex + 1);
     }
 
-    if (slides.length < 10) {
-      current.textContent = `0${slideIndex}`;
-    } else {
-      current.textContent = slideIndex;
-    }
-  });
-
-  prev.addEventListener('click', () => {
-    if (offset === 0) { // Дошли до первого слайда
-      offset = +width.slice(0, width.length - 2) * (slides.length - 1); // 650 * 3 смещаемся до последнего слайда
-    } else {
-      offset -= +width.slice(0, width.length - 2); // Смещает слайдер на 650px влево
-    }
-    slidesField.style.transform = `translateX(-${offset}px)`;
-
-    if (slideIndex === 1) {
-      slideIndex = slides.length;
-    } else {
-      slideIndex -= 1;
-    }
-
-    if (slides.length < 10) {
-      current.textContent = `0${slideIndex}`;
-    } else {
-      current.textContent = slideIndex;
-    }
-  });
-
-
+    xDown = null;
+    yDown = null;
+  }
 
 });

@@ -62,107 +62,69 @@ getResource('http://localhost:3000/menu')
 
 
 
-// Самодельный слайдер
+// Слайдер из курса
 
-const slider = document.querySelector('.offer__slider');
+const slides = document.querySelectorAll('.offer__slide');
+const prev = document.querySelector('.offer__slider-prev');
+const next = document.querySelector('.offer__slider-next');
 const current = document.querySelector('#current');
 const total = document.querySelector('#total');
+const slidesWrapper = document.querySelector('.offer__slider-wrapper');
+const slidesField = document.querySelector('.offer__slider-inner');
+const width = window.getComputedStyle(slidesWrapper).width;
 
-function leftOut(num) {
-  let i = 0;
-  setInterval(transform, 5);
-  function transform() {
-    if (i === 100) {
-      clearInterval();
-    } else {
-      i += 1;
-      slides[num].style.transform = `translateX(${-i}%)`;
-    }
+let slideIndex = 1;
+let offset = 0;
+
+if (slides.length < 10) {
+  total.textContent = `0${slides.length}`; // Добавляет ноль если одна цифра
+  current.textContent = `0${slideIndex}`;
+} else {
+  total.textContent = slides.length;
+  current.textContent = slideIndex;
+}
+
+slidesField.style.width = `${100 * slides.length}%`;
+
+next.addEventListener('click', () => {
+  if (offset === +width.slice(0, width.length - 2) * (slides.length - 1)) { // 650 * 3 дошли до последнего слайда
+    offset = 0; // Возвращаемся к первому
+  } else {
+    offset += +width.slice(0, width.length - 2); // Смещает слайдер на 650px вправо
   }
-}
 
-function rightIn(num) {
-  let i = 100;
-  setInterval(transform, 5);
-  function transform() {
-    if (i === 0) {
-      clearInterval();
-    } else {
-      i -= 1;
-      slides[num].style.transform = `translateX(${i}%)`;
-    }
-  }
-}
+  slidesField.style.transform = `translateX(-${offset}px)`;
 
-function rightOut(num) {
-  let i = 0;
-  setInterval(transform, 5);
-  function transform() {
-    if (i === 100) {
-      clearInterval();
-    } else {
-      i += 1;
-      slides[num].style.transform = `translateX(${i}%)`;
-    }
-  }
-}
-
-function leftIn(num) {
-  let i = -100;
-  setInterval(transform, 5);
-  function transform() {
-    if (i === 0) {
-      clearInterval();
-    } else {
-      i += 1;
-      slides[num].style.transform = `translateX(${i}%)`;
-    }
-  }
-}
-
-let slides;
-
-getResource('http://localhost:3000/slides')
-  .then((data) => createSlide(data));
-
-function createSlide(data) {
-  data.forEach(({img, altimg}) => {
-    const slide = document.createElement('div');
-    slide.classList.add('offer__slide');
-    slide.innerHTML = `<img src=${img} alt=${altimg}>`;
-    document.querySelector('.offer__slider-wrapper').append(slide);
-    slide.style.transform = `translateX(-100%)`;
-  });
-
-  slides = document.querySelectorAll('.offer__slide');
-  current.textContent = '01';
-  total.textContent = getZero(slides.length);
-  slides[0].style.transform = `translateX(0)`;
-}
-
-let slideIndex = 0;
-
-slider.addEventListener('click', (event) => {
-  if (event.target && event.target.matches('.offer__slider-next, .offer__slider-next *')) {
+  if (slideIndex === slides.length) {
+    slideIndex = 1;
+  } else {
     slideIndex += 1;
-    if (slideIndex > slides.length - 1) {
-      slideIndex = 0;
-      leftOut(slides.length - 1);
-      rightIn(slideIndex);
-    } else if (slideIndex <= slides.length - 1) {
-      leftOut(slideIndex - 1);
-      rightIn(slideIndex);
-    }
-  } else if (event.target && event.target.matches('.offer__slider-prev, .offer__slider-prev *')) {
-    slideIndex -= 1;
-    if (slideIndex < 0) {
-      slideIndex = slides.length - 1;
-      rightOut(0);
-      leftIn(slideIndex);
-    } else if (slideIndex >= 0) {
-      rightOut(slideIndex + 1);
-      leftIn(slideIndex);
-    }
   }
-  current.textContent = getZero(slideIndex + 1);
+
+  if (slides.length < 10) {
+    current.textContent = `0${slideIndex}`;
+  } else {
+    current.textContent = slideIndex;
+  }
+});
+
+prev.addEventListener('click', () => {
+  if (offset === 0) { // Дошли до первого слайда
+    offset = +width.slice(0, width.length - 2) * (slides.length - 1); // 650 * 3 смещаемся до последнего слайда
+  } else {
+    offset -= +width.slice(0, width.length - 2); // Смещает слайдер на 650px влево
+  }
+  slidesField.style.transform = `translateX(-${offset}px)`;
+
+  if (slideIndex === 1) {
+    slideIndex = slides.length;
+  } else {
+    slideIndex -= 1;
+  }
+
+  if (slides.length < 10) {
+    current.textContent = `0${slideIndex}`;
+  } else {
+    current.textContent = slideIndex;
+  }
 });
