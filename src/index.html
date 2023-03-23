@@ -103,18 +103,23 @@
             </div>
             <div class="offer__slider">
                 <div class="offer__slider-counter">
-                    <div class="offer__slider-prev">
-                        <img src="icons/left.svg" alt="prev">
+                    <div data-action="prev" class="offer__slider-prev">
+                        <img data-action="prev" src="icons/left.svg" alt="prev">
                     </div>
                     <span id="current"></span>
                     /
                     <span id="total"></span>
-                    <div class="offer__slider-next">
-                        <img src="icons/right.svg" alt="next">
+                    <div data-action="next" class="offer__slider-next">
+                        <img data-action="next" src="icons/right.svg" alt="next">
                     </div>
                 </div>
                 <div class="offer__slider-wrapper">
-                    <div class="offer__slider-inner">
+                    <div class="offer__slider-inner transition">
+                        <!-- Cloned last slide -->
+                        <div class="offer__slide">
+                            <img src="img/slider/paprika.jpg" alt="paprika">
+                        </div>
+                        <!--  -->
                         <div class="offer__slide">
                             <img src="img/slider/pepper.jpg" alt="pepper">
                         </div>
@@ -127,6 +132,11 @@
                         <div class="offer__slide">
                             <img src="img/slider/paprika.jpg" alt="paprika">
                         </div>
+                        <!-- Cloned first slide -->
+                        <div class="offer__slide">
+                            <img src="img/slider/pepper.jpg" alt="pepper">
+                        </div>
+                        <!--  -->
                     </div>
                 </div>
             </div>

@@ -255,27 +255,61 @@ window.addEventListener('DOMContentLoaded', () => {
   const slides = document.querySelectorAll('.offer__slide');
   const images = document.querySelectorAll('.offer__slide img');
 
-  const wrapperWidth = parseInt(window.getComputedStyle(wrapper).width, 10);
-  let slideIndex = 0;
-  inner.style.width = `${wrapperWidth * slides.length}px`;
-  current.textContent = getZero(slideIndex + 1);
-  total.textContent = getZero(slides.length);
+  const wrapperWidth = parseInt(window.getComputedStyle(wrapper).width, 10); // parseInt отбрасывает 'px'
+  let slideIndex = 1;
+  let canSlide = true;
+  inner.style.width = `${wrapperWidth * slides.length}px`; // ширина ленты со слайдами
+  current.textContent = getZero(slideIndex); // getZero добавляет ноль, если число из 1 цифры
+  total.textContent = getZero(slides.length - 2); // не считать клоны слайдов
+  inner.style.transform = `translateX(${-wrapperWidth * (slideIndex)}px)`; // сначала показывает первый слайд (0й это клон последнего)
+
+  function clickDelay() { // Следующий клик можно сделать только через 1с
+    canSlide = false;
+    setTimeout(() => {
+      canSlide = true;
+    }, 1001);
+  }
+
+  function nextSlide() {
+    if (slideIndex > slides.length - 2) { // долистал до предпоследнего слайда (последний это клон 1го)
+      slideIndex = 1; // счетчик на первый слайд
+      inner.style.transform = `translateX(${-wrapperWidth * (slides.length - 1)}px)`; // показывает последний слайд (клон 1го)
+      inner.addEventListener('transitionend', () => { // ждет окончания анимации слайда
+        inner.classList.remove('transition'); // убирает эффект перехода, чтобы незаметно перейти на 1 слайд
+        inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`; // переходит на 1 слайд
+      });
+    } else {
+      inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`;
+    }
+  }
+
+  function prevSlide() {
+    if (slideIndex < 1) { // долистал до 1 слайда (0 это клон первого)
+      slideIndex = slides.length - 2; // счетчик на предпоследний слайд
+      inner.style.transform = `translateX(${0}px)`; // показывает 0 слайд (клон последнего)
+      inner.addEventListener('transitionend', () => { // ждет окончания анимации слайда
+        inner.classList.remove('transition'); // убирает эффект перехода, чтобы незаметно перейти на предпоследний слайд
+        inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`; // переходит на предпоследний слайд
+      });
+    } else {
+      inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`;
+    }
+  }
 
   slider.addEventListener('click', (event) => {
-    if (event.target && event.target.matches('.offer__slider-next, .offer__slider-next *')) {
+    inner.classList.add('transition');
+    if (event.target && event.target.matches('[data-action="next"]') && canSlide === true) {
+      clickDelay();
       slideIndex += 1;
-      if (slideIndex > slides.length - 1) {
-        slideIndex -= 1; // Можно поставить 0 - возвращает на первый слайд
-      }
-    } else if (event.target && event.target.matches('.offer__slider-prev, .offer__slider-prev *')) {
+      nextSlide();
+    } else if (event.target && event.target.matches('[data-action="prev"]') && canSlide === true) {
+      clickDelay();
       slideIndex -= 1;
-      if (slideIndex < 0) {
-        slideIndex += 1; // Можно поставить = slides.length - 1 - возвращает на последний слайд
-      }
+      prevSlide();
     }
-    inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`;
-    current.textContent = getZero(slideIndex + 1);
+    current.textContent = getZero(slideIndex);
   });
+
 
   // Свайпы для слайдера
 
@@ -290,39 +324,41 @@ window.addEventListener('DOMContentLoaded', () => {
   let xDown = null;
   let yDown = null;
 
-  function handleTouchStart(evt) { // прикосновение
-    xDown = evt.clientX;
-    yDown = evt.clientY;
+  function handleTouchStart(event) { // прикосновение
+    xDown = event.clientX; // координаты точки ЛКМ
+    yDown = event.clientY;
   }
 
-  function handleTouchMove(evt) { // движение пальцем по экрану
-    if (!xDown || !yDown) {
+  function handleTouchMove(event) { // движение пальцем по экрану
+    if (!xDown || !yDown) { // проверка, что ЛКМ зажата
       return;
     }
 
-    const xUp = evt.clientX;
-    const yUp = evt.clientY;
+    const xUp = event.clientX; // текущие координаты
+    const yUp = event.clientY;
 
-    const xDiff = xDown - xUp;
+    const xDiff = xDown - xUp; // насколько сместились от точки зажатия ЛКМ
     const yDiff = yDown - yUp;
 
-    if (Math.abs(xDiff) > Math.abs(yDiff)) {
-      if (xDiff > 0) {
-        slideIndex += 1;
-        if (slideIndex > slides.length - 1) {
-          slideIndex -= 1;
-        }
-      } else {
-        slideIndex -= 1;
-        if (slideIndex < 0) {
-          slideIndex += 1;
-        }
+    // console.log(`xDown ${xDown}`);
+    // console.log(`yDown ${yDown}`);
+
+    // console.log(`xUp ${xUp}`);
+    // console.log(`yUp ${yUp}`);
+
+    // console.log(`xDiff ${xDiff}`);
+    // console.log(`yDiff ${yDiff}`);
+
+    if (Math.abs(xDiff) > Math.abs(yDiff)) { // сравниваются модули, определяет горизонтальный свайп
+      if (xDiff > 0) { // yDiff > 0 это будет вертикальный свайп
+        console.log('prev');
+      } else if (xDiff < 0) {
+        console.log('next');
       }
-      inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`;
-      current.textContent = getZero(slideIndex + 1);
+      current.textContent = getZero(slideIndex);
     }
 
-    xDown = null;
+    xDown = null; // обнуляет значения
     yDown = null;
   }
 
