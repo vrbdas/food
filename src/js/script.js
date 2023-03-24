@@ -315,25 +315,42 @@ window.addEventListener('DOMContentLoaded', () => {
 
   let mouseStart = 0;
   let mouseMove = 0;
+  const threshold = 100;
+  let initialPos;
 
   inner.addEventListener('mousedown', (event) => { // нажатие мыши
     event.preventDefault(); // удаляет встроенное в браузер перетаскивание картинки
     inner.classList.remove('transition'); // удаляет свойство transition, c ним всё глючит
     mouseStart = event.clientX; // положение мыши при нажатии
-    document.onmouseup = dragEnd; // отпускание мыши
-    document.onmousemove = dragAction; // движение мыши
-    inner.onmouseout = dragEnd; // отменяет перетаскивание, если курсор вышел за пределы слайда
+    initialPos = +inner.style.transform.match(/[-0-9.]+/)[0]; // translateX перед началом перетаскивания
+
+    inner.addEventListener('mousemove', dragAction); // движение мыши
+    inner.addEventListener('mouseup', dragEnd); // отпускание мыши
+    inner.addEventListener('mouseout', dragEnd); // отменяет перетаскивание, если курсор вышел за пределы слайда
   });
 
   function dragAction(event) {
     mouseMove = mouseStart - event.clientX; // после события onmousemove смещение курсора от начального положения на 1px влево или вправо
     mouseStart = event.clientX; // сразу возвращает начальное положение к месту, где находится мышь
-    inner.style.left = `${(inner.offsetLeft - mouseMove)}px`; // смещает картинку вместе с курсором мыши
+
+    const currentTransform = +inner.style.transform.match(/[-0-9.]+/)[0];
+    // текущее значение translateX, рег.выражение отбрасывает текст "translateX:" и оставляет только минус, цифры и точки, остается массив с числом, берем 0й элемент
+
+    inner.style.transform = `translateX(${currentTransform - mouseMove}px)`;
   }
 
   function dragEnd() {
-    document.onmouseup = null; // сбрасывает все параметры
-    document.onmousemove = null;
+    inner.removeEventListener('mousemove', dragAction);
+    inner.removeEventListener('mouseup', dragEnd);
+
+    const finalPos = +inner.style.transform.match(/[-0-9.]+/)[0]; // translateX в конце перетаскивания
+    if (-finalPos - -initialPos > threshold) {
+      console.log('right');
+    } else if (-finalPos - -initialPos < -threshold) {
+      console.log('left');
+    } else {
+      inner.style.transform = `translateX(${initialPos}px)`;
+    }
   }
 
 });
