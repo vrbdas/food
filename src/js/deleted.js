@@ -128,3 +128,46 @@ prev.addEventListener('click', () => {
     current.textContent = slideIndex;
   }
 });
+
+
+// Свайпы для слайдера вариант 1
+
+images.forEach((item) => {
+  item.addEventListener('mousedown', handleTouchStart);
+  item.addEventListener('mousemove', handleTouchMove);
+  item.ondragstart = function() { // Отключает встроенное в браузер перетаскивание картинки
+    return false;
+  };
+});
+
+let xDown = null;
+let yDown = null;
+
+function handleTouchStart(event) { // прикосновение
+  xDown = event.clientX; // координаты точки ЛКМ
+  yDown = event.clientY;
+}
+
+function handleTouchMove(event) { // движение пальцем по экрану
+  if (!xDown || !yDown) { // проверка, что ЛКМ зажата
+    return;
+  }
+
+  const xUp = event.clientX; // текущие координаты
+  const yUp = event.clientY;
+
+  const xDiff = xDown - xUp; // насколько сместились от точки зажатия ЛКМ
+  const yDiff = yDown - yUp;
+
+  if (Math.abs(xDiff) > Math.abs(yDiff)) { // сравниваются модули, определяет горизонтальный свайп
+    if (xDiff > 0) { // yDiff > 0 это будет вертикальный свайп
+      console.log('prev');
+    } else if (xDiff < 0) {
+      console.log('next');
+    }
+    current.textContent = getZero(slideIndex);
+  }
+
+  xDown = null; // обнуляет значения
+  yDown = null;
+}

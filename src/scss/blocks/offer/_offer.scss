@@ -59,6 +59,7 @@
             color: rgba(0,0,0, .5);
         }
         &-wrapper {
+            position: relative;
             overflow: hidden;
             width: 100%;
             height: 390px;
@@ -67,6 +68,7 @@
         }
         &-inner {
             display: flex;
+            position: absolute;
         }
         &-prev {
             margin-right: 10px;

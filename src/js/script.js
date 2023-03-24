@@ -267,7 +267,7 @@ window.addEventListener('DOMContentLoaded', () => {
     canSlide = false;
     setTimeout(() => {
       canSlide = true;
-    }, 1001);
+    }, 1000);
   }
 
   function nextSlide() {
@@ -313,53 +313,27 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Свайпы для слайдера
 
-  images.forEach((item) => {
-    item.addEventListener('mousedown', handleTouchStart);
-    item.addEventListener('mousemove', handleTouchMove);
-    item.ondragstart = function() { // Отключает встроенное в браузер перетаскивание картинки
-      return false;
-    };
+  let mouseStart = 0;
+  let mouseMove = 0;
+
+  inner.addEventListener('mousedown', (event) => { // нажатие мыши
+    event.preventDefault(); // удаляет встроенное в браузер перетаскивание картинки
+    inner.classList.remove('transition'); // удаляет свойство transition, c ним всё глючит
+    mouseStart = event.clientX; // положение мыши при нажатии
+    document.onmouseup = dragEnd; // отпускание мыши
+    document.onmousemove = dragAction; // движение мыши
+    inner.onmouseout = dragEnd; // отменяет перетаскивание, если курсор вышел за пределы слайда
   });
 
-  let xDown = null;
-  let yDown = null;
-
-  function handleTouchStart(event) { // прикосновение
-    xDown = event.clientX; // координаты точки ЛКМ
-    yDown = event.clientY;
+  function dragAction(event) {
+    mouseMove = mouseStart - event.clientX; // после события onmousemove смещение курсора от начального положения на 1px влево или вправо
+    mouseStart = event.clientX; // сразу возвращает начальное положение к месту, где находится мышь
+    inner.style.left = `${(inner.offsetLeft - mouseMove)}px`; // смещает картинку вместе с курсором мыши
   }
 
-  function handleTouchMove(event) { // движение пальцем по экрану
-    if (!xDown || !yDown) { // проверка, что ЛКМ зажата
-      return;
-    }
-
-    const xUp = event.clientX; // текущие координаты
-    const yUp = event.clientY;
-
-    const xDiff = xDown - xUp; // насколько сместились от точки зажатия ЛКМ
-    const yDiff = yDown - yUp;
-
-    // console.log(`xDown ${xDown}`);
-    // console.log(`yDown ${yDown}`);
-
-    // console.log(`xUp ${xUp}`);
-    // console.log(`yUp ${yUp}`);
-
-    // console.log(`xDiff ${xDiff}`);
-    // console.log(`yDiff ${yDiff}`);
-
-    if (Math.abs(xDiff) > Math.abs(yDiff)) { // сравниваются модули, определяет горизонтальный свайп
-      if (xDiff > 0) { // yDiff > 0 это будет вертикальный свайп
-        console.log('prev');
-      } else if (xDiff < 0) {
-        console.log('next');
-      }
-      current.textContent = getZero(slideIndex);
-    }
-
-    xDown = null; // обнуляет значения
-    yDown = null;
+  function dragEnd() {
+    document.onmouseup = null; // сбрасывает все параметры
+    document.onmousemove = null;
   }
 
 });
