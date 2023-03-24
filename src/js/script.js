@@ -253,7 +253,6 @@ window.addEventListener('DOMContentLoaded', () => {
   const inner = document.querySelector('.offer__slider-inner');
   const wrapper = document.querySelector('.offer__slider-wrapper');
   const slides = document.querySelectorAll('.offer__slide');
-  const images = document.querySelectorAll('.offer__slide img');
 
   const wrapperWidth = parseInt(window.getComputedStyle(wrapper).width, 10); // parseInt отбрасывает 'px'
   let slideIndex = 1;
@@ -271,6 +270,7 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   function nextSlide() {
+    slideIndex += 1;
     if (slideIndex > slides.length - 2) { // долистал до предпоследнего слайда (последний это клон 1го)
       slideIndex = 1; // счетчик на первый слайд
       inner.style.transform = `translateX(${-wrapperWidth * (slides.length - 1)}px)`; // показывает последний слайд (клон 1го)
@@ -281,9 +281,12 @@ window.addEventListener('DOMContentLoaded', () => {
     } else {
       inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`;
     }
+    current.textContent = getZero(slideIndex);
+    clickDelay(); // добавляет задержку 1с
   }
 
   function prevSlide() {
+    slideIndex -= 1;
     if (slideIndex < 1) { // долистал до 1 слайда (0 это клон первого)
       slideIndex = slides.length - 2; // счетчик на предпоследний слайд
       inner.style.transform = `translateX(${0}px)`; // показывает 0 слайд (клон последнего)
@@ -294,39 +297,39 @@ window.addEventListener('DOMContentLoaded', () => {
     } else {
       inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`;
     }
+    current.textContent = getZero(slideIndex);
+    clickDelay(); // добавляет задержку 1с
   }
 
-  slider.addEventListener('click', (event) => {
-    inner.classList.add('transition');
-    if (event.target && event.target.matches('[data-action="next"]') && canSlide === true) {
-      clickDelay();
-      slideIndex += 1;
-      nextSlide();
-    } else if (event.target && event.target.matches('[data-action="prev"]') && canSlide === true) {
-      clickDelay();
-      slideIndex -= 1;
-      prevSlide();
+  slider.addEventListener('click', (event) => { // клик на кнопки
+    if (canSlide === true) { // не запускает обработчик, пока не прошла задержка 1с
+      inner.classList.add('transition');
+      if (event.target && event.target.matches('[data-action="next"]')) {
+        nextSlide();
+      } else if (event.target && event.target.matches('[data-action="prev"]')) {
+        prevSlide();
+      }
     }
-    current.textContent = getZero(slideIndex);
   });
-
 
   // Свайпы для слайдера
 
   let mouseStart = 0;
   let mouseMove = 0;
-  const threshold = 100;
+  const threshold = wrapperWidth * 0.33; // порог, после которого переключается слайд = треть от ширины одного слайда
   let initialPos;
 
   inner.addEventListener('mousedown', (event) => { // нажатие мыши
     event.preventDefault(); // удаляет встроенное в браузер перетаскивание картинки
-    inner.classList.remove('transition'); // удаляет свойство transition, c ним всё глючит
-    mouseStart = event.clientX; // положение мыши при нажатии
-    initialPos = +inner.style.transform.match(/[-0-9.]+/)[0]; // translateX перед началом перетаскивания
+    if (canSlide === true) { // не запускает обработчик, пока не прошла задержка 1с
+      inner.classList.remove('transition'); // удаляет свойство transition, c ним всё глючит
+      mouseStart = event.clientX; // положение мыши при нажатии
+      initialPos = +inner.style.transform.match(/[-0-9.]+/)[0]; // translateX перед началом перетаскивания
 
-    inner.addEventListener('mousemove', dragAction); // движение мыши
-    inner.addEventListener('mouseup', dragEnd); // отпускание мыши
-    inner.addEventListener('mouseout', dragEnd); // отменяет перетаскивание, если курсор вышел за пределы слайда
+      inner.addEventListener('mousemove', dragAction); // движение мыши
+      inner.addEventListener('mouseup', dragEnd); // отпускание мыши
+      inner.addEventListener('mouseout', dragEnd); // отменяет перетаскивание, если курсор вышел за пределы слайда
+    }
   });
 
   function dragAction(event) {
@@ -340,17 +343,21 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   function dragEnd() {
-    inner.removeEventListener('mousemove', dragAction);
-    inner.removeEventListener('mouseup', dragEnd);
-
     const finalPos = +inner.style.transform.match(/[-0-9.]+/)[0]; // translateX в конце перетаскивания
+
     if (-finalPos - -initialPos > threshold) {
-      console.log('right');
+      inner.classList.add('transition');
+      nextSlide();
     } else if (-finalPos - -initialPos < -threshold) {
-      console.log('left');
+      inner.classList.add('transition');
+      prevSlide();
     } else {
-      inner.style.transform = `translateX(${initialPos}px)`;
+      inner.style.transform = `translateX(${initialPos}px)`; // если смещение меньше порога, возвращает к тому положению, где была зажата ЛКМ
     }
+
+    inner.removeEventListener('mousemove', dragAction); // удаляет все обработчики событий
+    inner.removeEventListener('mouseup', dragEnd);
+    inner.removeEventListener('mouseout', dragEnd);
   }
 
 });
