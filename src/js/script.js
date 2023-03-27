@@ -252,15 +252,25 @@ window.addEventListener('DOMContentLoaded', () => {
   const total = document.querySelector('#total');
   const inner = document.querySelector('.offer__slider-inner');
   const wrapper = document.querySelector('.offer__slider-wrapper');
-  const slides = document.querySelectorAll('.offer__slide');
+  const slides = document.querySelectorAll('.offer__slide'); // клоны сюда не попадут, это статический nodelist
+
+  const firstSlideClone = document.createElement('div'); // создает клон первого слайда и помещает его в конец
+  firstSlideClone.classList.add('offer__slide');
+  firstSlideClone.innerHTML = slides[0].innerHTML;
+  inner.append(firstSlideClone);
+
+  const lastSlideClone = document.createElement('div'); // создает клон последнего слайда и помещает его в начало
+  lastSlideClone.classList.add('offer__slide');
+  lastSlideClone.innerHTML = slides[slides.length - 1].innerHTML;
+  inner.prepend(lastSlideClone);
 
   const wrapperWidth = parseInt(window.getComputedStyle(wrapper).width, 10); // parseInt отбрасывает 'px'
   let slideIndex = 1;
   let canSlide = true;
-  inner.style.width = `${wrapperWidth * slides.length}px`; // ширина ленты со слайдами
+  inner.style.width = `${wrapperWidth * (slides.length + 2)}px`; // ширина ленты со слайдами, +2 это два клона, которых нет в slides
   current.textContent = getZero(slideIndex); // getZero добавляет ноль, если число из 1 цифры
-  total.textContent = getZero(slides.length - 2); // не считать клоны слайдов
-  inner.style.transform = `translateX(${-wrapperWidth * (slideIndex)}px)`; // сначала показывает первый слайд (0й это клон последнего)
+  total.textContent = getZero(slides.length); // клоны слайдов не считаются
+  inner.style.transform = `translateX(${-wrapperWidth * (slideIndex)}px)`; // сначала показывает первый слайд
 
   function clickDelay() { // Следующий клик можно сделать только через 1с
     canSlide = false;
@@ -271,9 +281,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
   function nextSlide() {
     slideIndex += 1;
-    if (slideIndex > slides.length - 2) { // долистал до предпоследнего слайда (последний это клон 1го)
+    if (slideIndex > slides.length) { // долистал до последнего слайда
       slideIndex = 1; // счетчик на первый слайд
-      inner.style.transform = `translateX(${-wrapperWidth * (slides.length - 1)}px)`; // показывает последний слайд (клон 1го)
+      inner.style.transform = `translateX(${-wrapperWidth * (slides.length + 1)}px)`; // показывает клон 1го
       inner.addEventListener('transitionend', () => { // ждет окончания анимации слайда
         inner.classList.remove('transition'); // убирает эффект перехода, чтобы незаметно перейти на 1 слайд
         inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`; // переходит на 1 слайд
@@ -287,12 +297,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
   function prevSlide() {
     slideIndex -= 1;
-    if (slideIndex < 1) { // долистал до 1 слайда (0 это клон первого)
-      slideIndex = slides.length - 2; // счетчик на предпоследний слайд
-      inner.style.transform = `translateX(${0}px)`; // показывает 0 слайд (клон последнего)
+    if (slideIndex < 1) { // долистал до 1 слайда
+      slideIndex = slides.length; // счетчик на последний слайд
+      inner.style.transform = `translateX(${0}px)`; // показывает клон последнего слайда
       inner.addEventListener('transitionend', () => { // ждет окончания анимации слайда
-        inner.classList.remove('transition'); // убирает эффект перехода, чтобы незаметно перейти на предпоследний слайд
-        inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`; // переходит на предпоследний слайд
+        inner.classList.remove('transition'); // убирает эффект перехода, чтобы незаметно перейти на последний слайд
+        inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`; // переходит на последний слайд
       });
     } else {
       inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`;
@@ -304,7 +314,7 @@ window.addEventListener('DOMContentLoaded', () => {
   slider.addEventListener('click', (event) => { // клик на кнопки
     if (canSlide === true) { // не запускает обработчик, пока не прошла задержка 1с
       inner.classList.add('transition');
-      if (event.target && event.target.matches('[data-action="next"]')) {
+      if (event.target && event.target.matches('[data-action="next"]')) { // data-аттрибуты добавить блоку с кнопкой и самой картинке со стрелкой
         nextSlide();
       } else if (event.target && event.target.matches('[data-action="prev"]')) {
         prevSlide();
