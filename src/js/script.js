@@ -128,7 +128,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  const modalTimerId = setTimeout(modalShow, 900000); // Автоматически открывает модальное окно по таймеру через 15 мин
+  const modalTimerId = setTimeout(modalShow, 9999999999); // Автоматически открывает модальное окно по таймеру
 
   function showModalByScroll() {
     if (document.documentElement.scrollTop + 1 + document.documentElement.clientHeight >= document.documentElement.scrollHeight) { // document.documentElement это <html></html>
@@ -265,6 +265,16 @@ window.addEventListener('DOMContentLoaded', () => {
   lastSlideClone.innerHTML = slides[slides.length - 1].innerHTML;
   inner.prepend(lastSlideClone);
 
+  const nav = document.querySelector('.offer__slider-navigation'); // блок с точками
+  let dots;
+  for (let i = 0; i < slides.length; i += 1) { // создает точки по количеству слайдов
+    const dot = document.createElement('div');
+    dot.classList.add('offer__slider-dot');
+    nav.append(dot);
+    dots = document.querySelectorAll('.offer__slider-dot');
+  }
+
+
   const wrapperWidth = parseInt(window.getComputedStyle(wrapper).width, 10); // parseInt отбрасывает 'px'
   let slideIndex = 1;
   let canSlide = true;
@@ -272,6 +282,7 @@ window.addEventListener('DOMContentLoaded', () => {
   current.textContent = getZero(slideIndex); // getZero добавляет ноль, если число из 1 цифры
   total.textContent = getZero(slides.length); // клоны слайдов не считаются
   inner.style.transform = `translateX(${-wrapperWidth * (slideIndex)}px)`; // сначала показывает первый слайд
+  dots[slideIndex - 1].classList.add('offer__slider-dot-active'); // сначала активна первая точка
 
   function clickDelay() { // Следующий клик можно сделать только через указанное время
     canSlide = false;
@@ -280,10 +291,9 @@ window.addEventListener('DOMContentLoaded', () => {
     }, transition * 1000); // сек переводятся в мс
   }
 
-  function removeTransition(element, callback) {
-    element.addEventListener('transitionend', () => { // ждет окончания анимации
-      element.style.transition = 'none'; // убирает эффект перехода
-      callback();
+  function removeTransition() {
+    inner.addEventListener('transitionend', () => { // ждет окончания анимации
+      inner.style.transition = 'none'; // убирает эффект перехода
     });
   }
 
@@ -293,14 +303,19 @@ window.addEventListener('DOMContentLoaded', () => {
     if (slideIndex > slides.length) { // долистал до последнего слайда
       slideIndex = 1; // счетчик на первый слайд
       inner.style.transform = `translateX(${-wrapperWidth * (slides.length + 1)}px)`; // показывает клон 1го
-      removeTransition(inner, () => { // убирает эффект перехода, чтобы незаметно перейти на 1 слайд
-        inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`; // переходит на 1 слайд
+      inner.addEventListener('transitionend', () => { // ждет окончания анимации
+        inner.style.transition = 'none'; // // убирает эффект перехода, чтобы незаметно перейти на первый слайд
+        inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`; // переходит на первый слайд
       });
     } else {
-      inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`; // переходит на следующий слайд
-      removeTransition(inner);
+      inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`; // показывает следующий слайд
+      removeTransition();
     }
     current.textContent = getZero(slideIndex);
+    dots.forEach((item) => {
+      item.classList.remove('offer__slider-dot-active');
+    });
+    dots[slideIndex - 1].classList.add('offer__slider-dot-active');
     clickDelay(); // добавляет задержку 1с
   }
 
@@ -310,14 +325,19 @@ window.addEventListener('DOMContentLoaded', () => {
     if (slideIndex < 1) { // долистал до 1 слайда
       slideIndex = slides.length; // счетчик на последний слайд
       inner.style.transform = `translateX(${0}px)`; // показывает клон последнего слайда
-      removeTransition(inner, () => { // убирает эффект перехода, чтобы незаметно перейти на последний слайд
+      inner.addEventListener('transitionend', () => { // ждет окончания анимации
+        inner.style.transition = 'none'; // убирает эффект перехода, чтобы незаметно перейти на последний слайд
         inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`; // переходит на последний слайд
-      }); // callback для того, чтобы переходил только после окончания анимации
+      });
     } else {
-      inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`; // переходит на предыдущий слайд
-      removeTransition(inner);
+      inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`; // показывает предыдущий слайд
+      removeTransition();
     }
     current.textContent = getZero(slideIndex);
+    dots.forEach((item) => {
+      item.classList.remove('offer__slider-dot-active');
+    });
+    dots[slideIndex - 1].classList.add('offer__slider-dot-active');
     clickDelay(); // добавляет задержку 1с
   }
 
@@ -327,6 +347,20 @@ window.addEventListener('DOMContentLoaded', () => {
         nextSlide();
       } else if (event.target && event.target.matches('[data-action="prev"]')) {
         prevSlide();
+      } else if (event.target && event.target.matches('.offer__slider-dot')) {
+        dots.forEach((item, i) => {
+          if (item === event.target) {
+            dots.forEach((dot) => {
+              dot.classList.remove('offer__slider-dot-active');
+            });
+            dots[i].classList.add('offer__slider-dot-active');
+            slideIndex = i + 1;
+            current.textContent = getZero(slideIndex);
+            inner.style.transition = `all ${transition}s`;
+            inner.style.transform = `translateX(${-wrapperWidth * (slideIndex)}px)`;
+            removeTransition();
+          }
+        });
       }
     }
   });
@@ -379,5 +413,8 @@ window.addEventListener('DOMContentLoaded', () => {
     inner.removeEventListener('mouseup', dragEnd);
     inner.removeEventListener('mouseout', dragEnd);
   }
+
+
+
 
 });
