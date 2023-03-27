@@ -253,6 +253,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const inner = document.querySelector('.offer__slider-inner');
   const wrapper = document.querySelector('.offer__slider-wrapper');
   const slides = document.querySelectorAll('.offer__slide'); // клоны сюда не попадут, это статический nodelist
+  const transition = 0.75; // время плавного перехода между слайдами в секундах
 
   const firstSlideClone = document.createElement('div'); // создает клон первого слайда и помещает его в конец
   firstSlideClone.classList.add('offer__slide');
@@ -272,48 +273,56 @@ window.addEventListener('DOMContentLoaded', () => {
   total.textContent = getZero(slides.length); // клоны слайдов не считаются
   inner.style.transform = `translateX(${-wrapperWidth * (slideIndex)}px)`; // сначала показывает первый слайд
 
-  function clickDelay() { // Следующий клик можно сделать только через 1с
+  function clickDelay() { // Следующий клик можно сделать только через указанное время
     canSlide = false;
     setTimeout(() => {
       canSlide = true;
-    }, 1000);
+    }, transition * 1000); // сек переводятся в мс
+  }
+
+  function removeTransition(element, callback) {
+    element.addEventListener('transitionend', () => { // ждет окончания анимации
+      element.style.transition = 'none'; // убирает эффект перехода
+      callback();
+    });
   }
 
   function nextSlide() {
+    inner.style.transition = `all ${transition}s`; // добавляет анимацию плавного перелистывания
     slideIndex += 1;
     if (slideIndex > slides.length) { // долистал до последнего слайда
       slideIndex = 1; // счетчик на первый слайд
       inner.style.transform = `translateX(${-wrapperWidth * (slides.length + 1)}px)`; // показывает клон 1го
-      inner.addEventListener('transitionend', () => { // ждет окончания анимации слайда
-        inner.classList.remove('transition'); // убирает эффект перехода, чтобы незаметно перейти на 1 слайд
+      removeTransition(inner, () => { // убирает эффект перехода, чтобы незаметно перейти на 1 слайд
         inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`; // переходит на 1 слайд
       });
     } else {
-      inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`;
+      inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`; // переходит на следующий слайд
+      removeTransition(inner);
     }
     current.textContent = getZero(slideIndex);
     clickDelay(); // добавляет задержку 1с
   }
 
   function prevSlide() {
+    inner.style.transition = `all ${transition}s`; // добавляет анимацию плавного перелистывания
     slideIndex -= 1;
     if (slideIndex < 1) { // долистал до 1 слайда
       slideIndex = slides.length; // счетчик на последний слайд
       inner.style.transform = `translateX(${0}px)`; // показывает клон последнего слайда
-      inner.addEventListener('transitionend', () => { // ждет окончания анимации слайда
-        inner.classList.remove('transition'); // убирает эффект перехода, чтобы незаметно перейти на последний слайд
+      removeTransition(inner, () => { // убирает эффект перехода, чтобы незаметно перейти на последний слайд
         inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`; // переходит на последний слайд
-      });
+      }); // callback для того, чтобы переходил только после окончания анимации
     } else {
-      inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`;
+      inner.style.transform = `translateX(${-wrapperWidth * slideIndex}px)`; // переходит на предыдущий слайд
+      removeTransition(inner);
     }
     current.textContent = getZero(slideIndex);
     clickDelay(); // добавляет задержку 1с
   }
 
   slider.addEventListener('click', (event) => { // клик на кнопки
-    if (canSlide === true) { // не запускает обработчик, пока не прошла задержка 1с
-      inner.classList.add('transition');
+    if (canSlide === true) { // не запускает обработчик, пока не прошла задержка
       if (event.target && event.target.matches('[data-action="next"]')) { // data-аттрибуты добавить блоку с кнопкой и самой картинке со стрелкой
         nextSlide();
       } else if (event.target && event.target.matches('[data-action="prev"]')) {
@@ -330,9 +339,9 @@ window.addEventListener('DOMContentLoaded', () => {
   let initialPos;
 
   inner.addEventListener('mousedown', (event) => { // нажатие мыши
+    // проверить, что у элемента нет css свойства transition, c ним всё глючит. в моем слайдере оно добавляется когда надо и сразу удаляется
     event.preventDefault(); // удаляет встроенное в браузер перетаскивание картинки
-    if (canSlide === true) { // не запускает обработчик, пока не прошла задержка 1с
-      inner.classList.remove('transition'); // удаляет свойство transition, c ним всё глючит
+    if (canSlide === true) { // не запускает обработчик, пока не прошла задержка
       mouseStart = event.clientX; // положение мыши при нажатии
       initialPos = +inner.style.transform.match(/[-0-9.]+/)[0]; // translateX перед началом перетаскивания
 
@@ -355,14 +364,15 @@ window.addEventListener('DOMContentLoaded', () => {
   function dragEnd() {
     const finalPos = +inner.style.transform.match(/[-0-9.]+/)[0]; // translateX в конце перетаскивания
 
-    if (-finalPos - -initialPos > threshold) {
-      inner.classList.add('transition');
+    if (-finalPos - -initialPos > threshold) { // если смещение больше порога, переключает слайд
       nextSlide();
     } else if (-finalPos - -initialPos < -threshold) {
-      inner.classList.add('transition');
       prevSlide();
-    } else {
-      inner.style.transform = `translateX(${initialPos}px)`; // если смещение меньше порога, возвращает к тому положению, где была зажата ЛКМ
+    } else { // если смещение меньше порога, возвращает к тому положению, где была зажата ЛКМ
+      inner.style.transition = `all ${transition}s`; // добавляет анимацию плавного перелистывания
+      inner.style.transform = `translateX(${initialPos}px)`;
+      removeTransition(inner);
+      clickDelay(); // добавляет задержку
     }
 
     inner.removeEventListener('mousemove', dragAction); // удаляет все обработчики событий
