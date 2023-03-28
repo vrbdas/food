@@ -197,13 +197,13 @@ window.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', (event) => { // Событие отправка формы кликом на кнопку или enter
       event.preventDefault();
 
-      const statusMessage = document.createElement('img'); // К форме добавляется блок с сообщениями о статусе отправки
-      statusMessage.setAttribute('src', 'img/form/spinner.svg');
-      statusMessage.style.cssText = `
+      const spinner = document.createElement('img'); // К форме добавляется спиннер загрузки
+      spinner.setAttribute('src', 'img/form/spinner.svg');
+      spinner.style.cssText = `
         display: block;
         margin: 0 auto;
       `;
-      form.insertAdjacentElement('afterend', statusMessage); // При загрузке показывает спиннер после формы
+      form.insertAdjacentElement('afterend', spinner); // При загрузке показывает спиннер после формы
 
       const formData = new FormData(form); // Данные из формы, во всех input обязательно должны быть аттрибуты name=""
 
@@ -213,7 +213,7 @@ window.addEventListener('DOMContentLoaded', () => {
         .then((data) => { // Обработка успешного promise
           console.log(data); // Ответ от сервера
           showThanksModal('Спасибо! Скоро мы с вами свяжемся');
-          statusMessage.remove(); // Удаляет спиннер загрузки
+          spinner.remove(); // Удаляет спиннер загрузки
         })
         .catch(() => { // Обработка reject (ошибки)
           showThanksModal('Что-то пошло не так...');
@@ -266,11 +266,11 @@ window.addEventListener('DOMContentLoaded', () => {
   let slideIndex = 1; // начальные значения
   let canSlide = true; // начальные значения
 
-  sliderInitialization();
-  sliderBtnsClicks();
-  sliderDragActions();
+  sliderInitialization(); // создание элементов слайдера и задание начального положения
+  sliderBtnsClicks(); // клик на кнопки и точки
+  sliderDragActions(); // перетаскивание для слайдера
 
-  function sliderInitialization() {
+  function sliderInitialization() { // создание элементов слайдера и задание начального положения
     const firstSlideClone = document.createElement('div'); // создает клон первого слайда и помещает его в конец
     firstSlideClone.classList.add('offer__slide');
     firstSlideClone.innerHTML = slides[0].innerHTML;
@@ -294,7 +294,7 @@ window.addEventListener('DOMContentLoaded', () => {
     showSlide(); // показывает слайд по индексу
   }
 
-  function clickDelay() { // Следующий клик можно сделать только через указанное время
+  function clickDelay() { // следующий клик можно сделать только через указанное время
     canSlide = false;
     setTimeout(() => {
       canSlide = true;
@@ -355,7 +355,7 @@ window.addEventListener('DOMContentLoaded', () => {
     clickDelay(); // добавляет задержку 1с
   }
 
-  function sliderBtnsClicks() { // клик на кнопки
+  function sliderBtnsClicks() { // клик на кнопки и точки
     slider.addEventListener('click', (event) => {
       if (canSlide === true) { // не запускает обработчик, пока не прошла задержка
         if (event.target && event.target.matches('[data-action="next"]')) { // data-аттрибуты добавить блоку с кнопкой и самой картинке со стрелкой
@@ -377,7 +377,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function sliderDragActions() { // Перетаскивание для слайдера
+  function sliderDragActions() { // перетаскивание для слайдера
     inner.addEventListener('mousedown', (event) => { // нажатие мыши
       // проверить, что у элемента нет css свойства transition, c ним всё глючит. в моем слайдере оно добавляется когда надо и сразу удаляется
       event.preventDefault(); // удаляет встроенное в браузер перетаскивание картинки
