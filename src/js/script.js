@@ -40,10 +40,23 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Таймер
 
-  const deadline = new Date(Date.parse(new Date()) + randomInteger((1 * 24 * 60 * 60 * 1000), (3 * 24 * 60 * 60 * 1000)));
-  // Добавляет случайное количество дней от 1 до 3 к текущей дате
+  let deadline;
+
+  if (localStorage.getItem('deadline') && Date.parse(localStorage.getItem('deadline')) > Date.parse(new Date())) {
+    // если в локальном хранилище есть дата окончания акции, и она позже сегодняшней
+    deadline = localStorage.getItem('deadline'); // использует эту дату
+  } else { // если в локальном хранилище нет даты окончания акции
+    deadline = new Date(Date.parse(new Date()) + randomInteger((1 * 24 * 60 * 60 * 1000), (3 * 24 * 60 * 60 * 1000)));
+    // Добавляет случайное количество дней от 1 до 3 к текущей дате
+    localStorage.setItem('deadline', deadline); // записывает получившуюся дату в локальное хранилище
+  }
 
   setClock('.timer', deadline);
+
+  function randomInteger(min, max) { // Случайное целое число от min до max
+    const rand = min + Math.random() * (max + 1 - min);
+    return Math.floor(rand);
+  }
 
   function getTimeRemaining(endtime) { // Вычисляет оставшееся время от текущей даты до endtime
     const t = Date.parse(endtime) - Date.parse(new Date()); // Вычитает текущую дату из конечной в мс
@@ -74,6 +87,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const hours = timer.querySelector('#hours'); // Блок с часами
     const minutes = timer.querySelector('#minutes'); // Блок с минутами
     const seconds = timer.querySelector('#seconds'); // Блок с секундами
+
     const timeInterval = setInterval(updateClock, 1000); // Обновление таймера будет запускаться каждую секунду
 
     updateClock(); // Запускает функцию сразу, чтобы не ждать 1с до первого обновления
@@ -90,11 +104,6 @@ window.addEventListener('DOMContentLoaded', () => {
         clearInterval(timeInterval); // Останавливает обновление таймера, когда там будет 0
       }
     }
-  }
-
-  function randomInteger(min, max) { // Случайное целое число от min до max
-    const rand = min + Math.random() * (max + 1 - min);
-    return Math.floor(rand);
   }
 
   // Модальное окно
@@ -136,8 +145,8 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   function showModalByScroll() {
-    if (document.documentElement.scrollTop + 1 + document.documentElement.clientHeight >= document.documentElement.scrollHeight) { // document.documentElement это <html></html>
-      // Сколько прокручено до видимого экрана + Высота видимого экрана = Высота всего элемента без прокрутки
+    if (document.documentElement.scrollTop + 1 + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+      // Сколько прокручено до видимого экрана + Высота видимого экрана = Высота всего элемента без прокрутки. document.documentElement это <html></html>
       modalShow();
       window.removeEventListener('scroll', showModalByScroll);
     }
@@ -207,7 +216,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
       const formData = new FormData(form); // Данные из формы, во всех input обязательно должны быть аттрибуты name=""
 
-      const json = JSON.stringify(Object.fromEntries(formData.entries())); // Данные из формы превращает в массив массивов, его в обычный объект, а его в JSON
+      const json = JSON.stringify(Object.fromEntries(formData.entries()));
+      // Данные из формы превращает в массив массивов, его в обычный объект, а его в JSON
 
       postData('http://localhost:3000/requests', json)
         .then((data) => { // Обработка успешного promise
