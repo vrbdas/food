@@ -40,22 +40,27 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Таймер
 
-  let deadline;
+  let deadline; // дата окончания акции
 
-  if (localStorage.getItem('deadline') && Date.parse(localStorage.getItem('deadline')) > Date.parse(new Date())) {
-    // если в локальном хранилище есть дата окончания акции, и она позже сегодняшней
-    deadline = localStorage.getItem('deadline'); // использует эту дату
-  } else { // если в локальном хранилище нет даты окончания акции
-    deadline = new Date(Date.parse(new Date()) + randomInteger((1 * 24 * 60 * 60 * 1000), (3 * 24 * 60 * 60 * 1000)));
-    // Добавляет случайное количество дней от 1 до 3 к текущей дате
-    localStorage.setItem('deadline', deadline); // записывает получившуюся дату в локальное хранилище
-  }
+  promotionTime(); // устанавливает время окончания акции
+  setClock('.timer', deadline); // устанавливает таймер
 
-  setClock('.timer', deadline);
+  function promotionTime() { // устанавливает время окончания акции
+    if (localStorage.getItem('deadline') && Date.parse(localStorage.getItem('deadline')) > Date.parse(new Date())) {
+      // если в локальном хранилище есть дата окончания акции, и она позже сегодняшней
+      deadline = localStorage.getItem('deadline'); // использует эту дату
+    } else { // если в локальном хранилище нет даты окончания акции или она просрочена
+      const deadlineCalc = new Date(Date.now() + (1 * 24 * 60 * 60 * 1000)); // текущая дата в текущем часовом поясе + 1д
+      deadline = new Date(deadlineCalc.getFullYear(), deadlineCalc.getMonth(), deadlineCalc.getDate(), 0, 0, 0); // обнуляет часы минуты и сек в deadlineCalc
+      localStorage.setItem('deadline', deadline); // записывает получившуюся дату в локальное хранилище
+    }
 
-  function randomInteger(min, max) { // Случайное целое число от min до max
-    const rand = min + Math.random() * (max + 1 - min);
-    return Math.floor(rand);
+    const promotionEndText = new Date(deadline).toLocaleString('ru', {
+      day: '2-digit',
+      month: 'long',
+    }); // выводит дату в виде 2 цифр и месяц в виде слова, склоняя на русском языке
+
+    document.querySelector('#promotion-end').textContent = `Акция закончится ${promotionEndText} в 00:00`; // добавляет текст на страницу
   }
 
   function getTimeRemaining(endtime) { // Вычисляет оставшееся время от текущей даты до endtime
@@ -81,7 +86,7 @@ window.addEventListener('DOMContentLoaded', () => {
     return num;
   }
 
-  function setClock(timerBlock, endtime) {
+  function setClock(timerBlock, endtime) { // устанавливает таймер
     const timer = document.querySelector(timerBlock); // Контейнер с блоками таймера
     const days = timer.querySelector('#days'); // Блок с днями
     const hours = timer.querySelector('#hours'); // Блок с часами
@@ -111,13 +116,13 @@ window.addEventListener('DOMContentLoaded', () => {
   const modalTrigger = document.querySelectorAll('[data-modal]');
   const modal = document.querySelector('.modal'); // Изначально стоит класс .hide
 
-  const modalTimerId = setTimeout(modalShow, 9999999999); // Автоматически открывает модальное окно по таймеру
+  // const modalTimerId = setTimeout(modalShow, 900000); // Автоматически открывает модальное окно по таймеру через 15 минут
 
   modalTrigger.forEach((item) => { // Показавает окно при клике на кнопки 'Связаться с нами'
     item.addEventListener('click', modalShow);
   });
 
-  window.addEventListener('scroll', showModalByScroll); // Показывает окно при прокрутке страницы до самого конца
+  // window.addEventListener('scroll', showModalByScroll); // Показывает окно при прокрутке страницы до самого конца
 
   modal.addEventListener('click', (event) => { // Закрывает окно при клике на область вокруг .modal__dialog или на крестик
     if (event.target === modal || event.target.matches('[data-close]')) {
@@ -189,7 +194,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const forms = document.querySelectorAll('form');
   const postData = async(url, data) => { // Настраивает и посылает запрос на сервер
-    const result = await fetch(url, { // await дождется результата фукции fetch
+    const result = await fetch(url, { // await дождется результата функции fetch
       method: 'POST', // POST это отправка, GET получение
       headers: {'Content-type': 'application/json'}, // Заголовки нужны для JSON, если на сервер отправлять formData, то не нужны
       body: data, // Тело запроса, если запрос GET, то не нужно
@@ -407,7 +412,8 @@ window.addEventListener('DOMContentLoaded', () => {
     mouseStart = event.clientX; // сразу возвращает начальное положение к месту, где находится мышь
 
     const currentTransform = +inner.style.transform.match(/[-0-9.]+/)[0];
-    // текущее значение translateX, рег.выражение отбрасывает текст "translateX:" и оставляет только минус, цифры и точки, остается массив с числом, берем 0й элемент
+    // текущее значение translateX, рег.выражение отбрасывает текст "translateX:" и оставляет только минус, цифры и точки,
+    // + значит каждый символ из скобок может повторяться 1 или более раз. остается массив с числом, берем 0й элемент
 
     inner.style.transform = `translateX(${currentTransform - mouseMove}px)`;
   }
@@ -432,5 +438,83 @@ window.addEventListener('DOMContentLoaded', () => {
     inner.removeEventListener('mouseup', dragEnd);
     inner.removeEventListener('mouseout', dragEnd);
   }
+
+  // Калькулятор
+
+  const result = document.querySelector('.calculating__result span'); // ваша суточная норма калорий
+  let sex;
+  let height;
+  let weight;
+  let age;
+  let ratio;
+
+  calcTotal(); // вычисляет суточную норму калорий
+
+  getStaticInformation('#gender', 'calculating__choose-item_active'); // получает значения пол
+  getStaticInformation('.calculating__choose_big', 'calculating__choose-item_active'); // получает значения физическая активность
+  getDynamicInformation('#height'); // получает значения ваша конституция
+  getDynamicInformation('#weight'); // получает значения ваша конституция
+  getDynamicInformation('#age'); // получает значения ваша конституция
+
+  function calcTotal() { // вычисляет суточную норму калорий
+    if (!sex || !height || !weight || !age || !ratio) {
+      result.parentElement.style.visibility = 'hidden'; // если не все поля заполнены, скрывает блок c результатом
+      return; // прерывает выполнение функции
+    }
+
+    result.parentElement.style.visibility = 'visible'; // показывает блок c результатом
+
+    if (sex === 'female') { // https://fitseven.ru/zdorovie/metabolism/sutochnaya-norma-kaloriy
+      result.textContent = Math.round((447.6 + (9.2 * weight) + (3.1 * height) - (4.3 * age)) * ratio);
+    } else {
+      result.textContent = Math.round((88.36 + (13.4 * weight) + (4.8 * height) - (5.7 * age)) * ratio);
+    }
+  }
+
+  function getStaticInformation(parentSelector, activeClass) { // получает значения пол и физическая активность
+    const elements = document.querySelectorAll(`${parentSelector} div`); // получает все блоки внутри parentSelector
+
+    elements.forEach((item) => {
+      item.addEventListener('click', (event) => {
+        if (event.target.getAttribute('data-ratio')) { // если у объекта события есть аттрибут data-ratio="..."
+          ratio = +event.target.getAttribute('data-ratio'); // берет его значение
+        } else { // если нет аттрибута
+          sex = event.target.getAttribute('id'); // берет значение из id
+        }
+
+        elements.forEach((elem) => { // убирает класс активности у всех блоков
+          elem.classList.remove(activeClass);
+        });
+
+        event.target.classList.add(activeClass); // добавляет класс активности выбранному блоку
+
+        calcTotal();
+      });
+    });
+
+
+  }
+
+  function getDynamicInformation(selector) { // получает значения ваша конституция
+    const input = document.querySelector(selector);
+
+    input.addEventListener('input', () => {
+      switch (input.getAttribute('id')) {
+        case 'height':
+          height = +input.value;
+          break;
+        case 'weight':
+          weight = +input.value;
+          break;
+        case 'age':
+          age = +input.value;
+          break;
+      }
+
+      calcTotal();
+    });
+  }
+
+
 
 });

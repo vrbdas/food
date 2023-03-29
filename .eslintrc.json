@@ -63,6 +63,9 @@
     "indent": 1,
     "no-return-await": 0,
     "object-curly-newline": 1,
-    "no-return-assign": 0
+    "no-return-assign": 0,
+    "default-case": 0,
+    "keyword-spacing": 1,
+    "no-shadow": 1
   }
 }
