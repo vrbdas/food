@@ -8,7 +8,7 @@ gulp.task('styles', function() {
     return gulp.src("src/scss/**/*.+(scss|sass)")
         .pipe(sass().on('error', sass.logError))
         .pipe(autoprefixer())
-        .pipe(gulp.dest(`C:/program files/ospanel/domains/Food/css`))
+        .pipe(gulp.dest(`C:/Code/domains/Food/css`))
 });
 
 gulp.task('watch', function() {
@@ -23,32 +23,32 @@ gulp.task('watch', function() {
 
 gulp.task('html', function () {
     return gulp.src("src/*.html")
-        .pipe(gulp.dest("C:/program files/ospanel/domains/Food/"));
+        .pipe(gulp.dest("C:/Code/domains/Food/"));
 });
 
 gulp.task('scripts', function () {
     return gulp.src("src/js/**/*")
-        .pipe(gulp.dest("C:/program files/ospanel/domains/Food/js"))
+        .pipe(gulp.dest("C:/Code/domains/Food/js"))
 });
 
 gulp.task('fonts', function () {
     return gulp.src("src/fonts/**/*")
-        .pipe(gulp.dest("C:/program files/ospanel/domains/Food/fonts"))
+        .pipe(gulp.dest("C:/Code/domains/Food/fonts"))
 });
 
 gulp.task('php', function () {
     return gulp.src("src/php/**/*.php")
-        .pipe(gulp.dest("C:/program files/ospanel/domains/Food/php"))
+        .pipe(gulp.dest("C:/Code/domains/Food/php"))
 });
 
 gulp.task('icons', function () {
     return gulp.src("src/icons/**/*")
-        .pipe(gulp.dest("C:/program files/ospanel/domains/Food/icons"))
+        .pipe(gulp.dest("C:/Code/domains/Food/icons"))
 });
 
 gulp.task('images', function () {
     return gulp.src("src/img/**/*")
-        .pipe(gulp.dest("C:/program files/ospanel/domains/Food/img"))
+        .pipe(gulp.dest("C:/Code/domains/Food/img"))
 });
 
 gulp.task('default', gulp.parallel('styles', 'watch', 'html', 'scripts', 'fonts', 'php', 'icons',  'images'));

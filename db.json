@@ -23,43 +23,6 @@
     }
   ],
   "requests": [
-    {
-      "name": "ргаит",
-      "phone": "+8887878787",
-      "id": 1
-    },
-    {
-      "name": "ргаит",
-      "phone": "+99999999999",
-      "id": 2
-    },
-    {
-      "name": "рлорлр",
-      "phone": "+8887878787",
-      "id": 3
-    },
-    {
-      "name": "ргаит",
-      "phone": "+99999999999",
-      "id": 4
-    }
-  ],
-  "slides": [
-    {
-      "img": "img/slider/pepper.jpg",
-      "altimg": "pepper"
-    },
-    {
-      "img": "img/slider/food-12.jpg",
-      "altimg": "food"
-    },
-    {
-      "img": "img/slider/olive-oil.jpg",
-      "altimg": "oil"
-    },
-    {
-      "img": "img/slider/paprika.jpg",
-      "altimg": "paprika"
-    }
+  
   ]
 }
