@@ -1,16 +1,11 @@
+import {modalShow, modalHide} from './modal';
+import {postData} from '../services/services';
+
 function forms() {
-  const forms = document.querySelectorAll('form');
-  const postData = async(url, data) => { // Настраивает и посылает запрос на сервер
-    const result = await fetch(url, { // await дождется результата функции fetch
-      method: 'POST', // POST это отправка, GET получение
-      headers: {'Content-type': 'application/json'}, // Заголовки нужны для JSON, если на сервер отправлять formData, то не нужны
-      body: data, // Тело запроса, если запрос GET, то не нужно
-    });
+  const formTags = document.querySelectorAll('form');
+  const modalBlock = document.querySelector('.modal'); // изначально в html стоит класс .hide
 
-    return await result.json(); // Ответ от сервера в виде PROMISE в формате JSON
-  };
-
-  forms.forEach((item) => { // На каждую форму вешает обработчик формы
+  formTags.forEach((item) => { // На каждую форму вешает обработчик формы
     bindPostData(item);
   });
 
@@ -50,9 +45,9 @@ function forms() {
     const formModalDialog = document.querySelector('.modal__dialog');
 
     formModalDialog.classList.add('hide'); // Скрывает внутреннюю часть старого окна
-    modalShow();
+    modalShow(); // Показывает модальное окно с пустой внутренней частью
 
-    const thanksModalDialog = document.createElement('div');
+    const thanksModalDialog = document.createElement('div'); // Создает внутреннюю часть с текстом text
     thanksModalDialog.classList.add('modal__dialog');
     thanksModalDialog.innerHTML = `
     <div class="modal__content">
@@ -60,7 +55,7 @@ function forms() {
       <div class="modal__title">${text}</div>
     </div>
     `;
-    modal.append(thanksModalDialog); // Вставляет новую внутреннюю часть
+    modalBlock.append(thanksModalDialog); // Вставляет новую внутреннюю часть в модальное окно
     setTimeout(() => { // Через 4с скрывает окно и возвращает внутреннюю часть с формой
       thanksModalDialog.remove();
       formModalDialog.classList.remove('hide');
@@ -70,4 +65,4 @@ function forms() {
   }
 }
 
-module.exports = forms;
+export default forms;

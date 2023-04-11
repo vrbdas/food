@@ -1,13 +1,6 @@
+import {getResource} from '../services/services';
+
 function cards() {
-  const getResource = async(url) => { // Настраивает и посылает запрос на сервер
-    const result = await fetch(url); // Fetch возвращает promise
-
-    if (!result.ok) {
-      throw new Error(`Could not fetch ${url}, status: ${result.status}`); // Создает объект ошибки и выбрасывает его как исключение
-    }
-
-    return await result.json(); // Promise в формате JSON
-  };
 
   getResource('http://localhost:3000/menu')
     .then((data) => createCard(data));
@@ -31,4 +24,4 @@ function cards() {
   }
 }
 
-module.exports = cards;
+export default cards;
