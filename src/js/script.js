@@ -9,12 +9,12 @@ import calc from './modules/calc'; // Калькулятор
 import {modalShow} from './modules/modal'; // Открывает модальное окно
 
 window.addEventListener('DOMContentLoaded', () => {
-  // const modalTimerId = setTimeout(() => modalShow(modalTimerId), 300000);
+  // const modalTimerId = setTimeout(() => modalShow('.modal', modalTimerId), 300000);
   // Автоматически открывает модальное окно по таймеру через 5 минут, передать его аргументом в modal()
 
-  tabs();
+  tabs('.tabcontent', '.tabheader__items', '.tabheader__item');
   timer();
-  modal(); // сюда аргументом передать modalTimerId, чтобы таймер удалялся при открытии модального окна
+  modal('.modal', '[data-modal]'); // сюда третьим аргументом передать modalTimerId, чтобы таймер удалялся при открытии модального окна
   cards();
   forms();
   slider();

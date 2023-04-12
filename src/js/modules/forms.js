@@ -26,7 +26,7 @@ function forms() {
       const json = JSON.stringify(Object.fromEntries(formData.entries()));
       // Данные из формы превращает в массив массивов, его в обычный объект, а его в JSON
 
-      postData('http://localhost:3000/requests', json)
+      postData('http://localhost:3000/requests', json) // Настраивает и посылает запрос на сервер
         .then((data) => { // Обработка успешного promise
           console.log(data); // Ответ от сервера
           showThanksModal('Спасибо! Скоро мы с вами свяжемся');
@@ -45,7 +45,7 @@ function forms() {
     const formModalDialog = document.querySelector('.modal__dialog');
 
     formModalDialog.classList.add('hide'); // Скрывает внутреннюю часть старого окна
-    modalShow(); // Показывает модальное окно с пустой внутренней частью
+    modalShow('.modal'); // Показывает модальное окно с пустой внутренней частью
 
     const thanksModalDialog = document.createElement('div'); // Создает внутреннюю часть с текстом text
     thanksModalDialog.classList.add('modal__dialog');
@@ -60,7 +60,7 @@ function forms() {
       thanksModalDialog.remove();
       formModalDialog.classList.remove('hide');
       formModalDialog.classList.add('show');
-      modalHide();
+      modalHide('.modal');
     }, 4000);
   }
 }

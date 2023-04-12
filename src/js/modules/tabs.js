@@ -1,17 +1,17 @@
-function tabs() {
-  const tabContentBlocks = document.querySelectorAll('.tabcontent'); // Блоки с картинкой
-  const tabHeaderContainer = document.querySelector('.tabheader__items'); // Контейнер с вкладками
-  const tabHeaderItems = document.querySelectorAll('.tabheader__item'); // Вкладки
+function tabs(tabContentBlockSelector, tabHeaderContainerSelector, tabHeaderItemSelector) {
+  const tabContentBlocks = document.querySelectorAll(tabContentBlockSelector); // Все вкладки
+  const tabHeaderContainer = document.querySelector(tabHeaderContainerSelector); // Контейнер с заголовками вкладок
+  const tabHeaderItems = document.querySelectorAll(tabHeaderItemSelector); // Все заголовки вкладок
 
   hideTabContent(); // Скрывает все вкладки
   showTabContent(); // Показывает первую вкладку по умолчанию (i = 0 в функции showTabContent)
 
   tabHeaderContainer.addEventListener('click', (event) => { // Обрабатывает клик на контейнер с вкладками
-    if (event.target && event.target.matches('.tabheader__item')) { // Проверяет клик на вкладку
-      tabHeaderItems.forEach((item, i) => { // Определяет номер вкладки
+    if (event.target && event.target.matches(tabHeaderItemSelector)) { // Проверяет клик на заголовок вкладки
+      tabHeaderItems.forEach((item, i) => { // Определяет номер
         if (item === event.target) {
           hideTabContent();
-          showTabContent(i); // Показывает нужную вкладку
+          showTabContent(i); // Показывает вкладку с выбранным номером
         }
       });
     }
@@ -23,14 +23,16 @@ function tabs() {
       item.classList.remove('show', 'fade');
     });
     tabHeaderItems.forEach((item) => {
-      item.classList.remove('tabheader__item_active'); // Делает все вкладки неактивными
+      item.classList.remove(`${tabHeaderItemSelector.slice(1)}_active`);
+      // Убирает класс активности у всех заголовков. slice убирает точку в начале имени класса
     });
   }
 
-  function showTabContent(i = 0) { // Показывает выбранный блок с картинкой
+  function showTabContent(i = 0) { // Показывает выбранную вкладку
     tabContentBlocks[i].classList.add('show', 'fade'); // display: block;
     tabContentBlocks[i].classList.remove('hide');
-    tabHeaderItems[i].classList.add('tabheader__item_active'); // Активирует выбранную вкладку
+    tabHeaderItems[i].classList.add(`${tabHeaderItemSelector.slice(1)}_active`);
+    // Добавляет класс активности к выбранному заголовку. slice убирает точку в начале имени класса
   }
 }
 

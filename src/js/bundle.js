@@ -214,7 +214,7 @@ function forms() {
       const json = JSON.stringify(Object.fromEntries(formData.entries()));
       // Данные из формы превращает в массив массивов, его в обычный объект, а его в JSON
 
-      (0,_services_services__WEBPACK_IMPORTED_MODULE_1__.postData)('http://localhost:3000/requests', json)
+      (0,_services_services__WEBPACK_IMPORTED_MODULE_1__.postData)('http://localhost:3000/requests', json) // Настраивает и посылает запрос на сервер
         .then((data) => { // Обработка успешного promise
           console.log(data); // Ответ от сервера
           showThanksModal('Спасибо! Скоро мы с вами свяжемся');
@@ -233,7 +233,7 @@ function forms() {
     const formModalDialog = document.querySelector('.modal__dialog');
 
     formModalDialog.classList.add('hide'); // Скрывает внутреннюю часть старого окна
-    (0,_modal__WEBPACK_IMPORTED_MODULE_0__.modalShow)(); // Показывает модальное окно с пустой внутренней частью
+    (0,_modal__WEBPACK_IMPORTED_MODULE_0__.modalShow)('.modal'); // Показывает модальное окно с пустой внутренней частью
 
     const thanksModalDialog = document.createElement('div'); // Создает внутреннюю часть с текстом text
     thanksModalDialog.classList.add('modal__dialog');
@@ -248,7 +248,7 @@ function forms() {
       thanksModalDialog.remove();
       formModalDialog.classList.remove('hide');
       formModalDialog.classList.add('show');
-      (0,_modal__WEBPACK_IMPORTED_MODULE_0__.modalHide)();
+      (0,_modal__WEBPACK_IMPORTED_MODULE_0__.modalHide)('.modal');
     }, 4000);
   }
 }
@@ -269,8 +269,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "modalHide": () => (/* binding */ modalHide),
 /* harmony export */   "modalShow": () => (/* binding */ modalShow)
 /* harmony export */ });
-function modalShow(modalTimerId) {
-  const modalBlock = document.querySelector('.modal'); // Изначально в html стоит класс hide
+function modalShow(modalBlockSelector, modalTimerId) {
+  const modalBlock = document.querySelector(modalBlockSelector); // Изначально в html стоит класс hide
   modalBlock.classList.add('show'); // display: block;
   modalBlock.classList.remove('hide'); // display: none;
   document.body.style.overflow = 'hidden'; // Предотвращает прокрутку страницы, когда открыто модальное окно
@@ -280,39 +280,39 @@ function modalShow(modalTimerId) {
   }
 }
 
-function modalHide() {
-  const modalBlock = document.querySelector('.modal'); // Изначально в html стоит класс hide
+function modalHide(modalBlockSelector) {
+  const modalBlock = document.querySelector(modalBlockSelector); // Изначально в html стоит класс hide
   modalBlock.classList.add('hide');
   modalBlock.classList.remove('show');
   document.body.style.overflow = ''; // Возвращает прокрутку страницы, когда закрыто модальное окно
 }
 
-function modal(modalTimerId) {
-  const modalBlock = document.querySelector('.modal'); // Изначально в html стоит класс hide
-  const modalTrigger = document.querySelectorAll('[data-modal]'); // Кнопка для вызова модального окна
+function modal(modalBlockSelector, modalTriggerSelector, modalTimerId) {
+  const modalBlock = document.querySelector(modalBlockSelector); // Изначально в html стоит класс hide
+  const modalTrigger = document.querySelectorAll(modalTriggerSelector); // Кнопка для вызова модального окна
 
   modalTrigger.forEach((item) => { // Показавает окно при клике на кнопки 'Связаться с нами'
-    item.addEventListener('click', () => modalShow(modalTimerId));
+    item.addEventListener('click', () => modalShow(modalBlockSelector, modalTimerId));
   });
 
   // window.addEventListener('scroll', showModalByScroll); // Показывает окно при прокрутке страницы до самого конца
 
   modalBlock.addEventListener('click', (event) => { // Закрывает окно при клике на область вокруг .modal__dialog или на крестик
     if (event.target === modalBlock || event.target.matches('[data-close]')) {
-      modalHide();
+      modalHide(modalBlockSelector);
     }
   });
 
   document.addEventListener('keydown', (event) => { // Закрывает окно при нажатии Esc
     if (event.code === 'Escape' && modalBlock.classList.contains('show')) {
-      modalHide();
+      modalHide(modalBlockSelector);
     }
   });
 
   function showModalByScroll() {
     if (document.documentElement.scrollTop + 1 + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
       // Сколько прокручено до видимого экрана + Высота видимого экрана = Высота всего элемента без прокрутки. document.documentElement это <html></html>
-      modalShow(modalTimerId);
+      modalShow(modalBlockSelector, modalTimerId);
       window.removeEventListener('scroll', showModalByScroll);
     }
   }
@@ -533,20 +533,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-function tabs() {
-  const tabContentBlocks = document.querySelectorAll('.tabcontent'); // Блоки с картинкой
-  const tabHeaderContainer = document.querySelector('.tabheader__items'); // Контейнер с вкладками
-  const tabHeaderItems = document.querySelectorAll('.tabheader__item'); // Вкладки
+function tabs(tabContentBlockSelector, tabHeaderContainerSelector, tabHeaderItemSelector) {
+  const tabContentBlocks = document.querySelectorAll(tabContentBlockSelector); // Все вкладки
+  const tabHeaderContainer = document.querySelector(tabHeaderContainerSelector); // Контейнер с заголовками вкладок
+  const tabHeaderItems = document.querySelectorAll(tabHeaderItemSelector); // Все заголовки вкладок
 
   hideTabContent(); // Скрывает все вкладки
   showTabContent(); // Показывает первую вкладку по умолчанию (i = 0 в функции showTabContent)
 
   tabHeaderContainer.addEventListener('click', (event) => { // Обрабатывает клик на контейнер с вкладками
-    if (event.target && event.target.matches('.tabheader__item')) { // Проверяет клик на вкладку
-      tabHeaderItems.forEach((item, i) => { // Определяет номер вкладки
+    if (event.target && event.target.matches(tabHeaderItemSelector)) { // Проверяет клик на заголовок вкладки
+      tabHeaderItems.forEach((item, i) => { // Определяет номер
         if (item === event.target) {
           hideTabContent();
-          showTabContent(i); // Показывает нужную вкладку
+          showTabContent(i); // Показывает вкладку с выбранным номером
         }
       });
     }
@@ -558,14 +558,16 @@ function tabs() {
       item.classList.remove('show', 'fade');
     });
     tabHeaderItems.forEach((item) => {
-      item.classList.remove('tabheader__item_active'); // Делает все вкладки неактивными
+      item.classList.remove(`${tabHeaderItemSelector.slice(1)}_active`);
+      // Убирает класс активности у всех заголовков. slice убирает точку в начале имени класса
     });
   }
 
-  function showTabContent(i = 0) { // Показывает выбранный блок с картинкой
+  function showTabContent(i = 0) { // Показывает выбранную вкладку
     tabContentBlocks[i].classList.add('show', 'fade'); // display: block;
     tabContentBlocks[i].classList.remove('hide');
-    tabHeaderItems[i].classList.add('tabheader__item_active'); // Активирует выбранную вкладку
+    tabHeaderItems[i].classList.add(`${tabHeaderItemSelector.slice(1)}_active`);
+    // Добавляет класс активности к выбранному заголовку. slice убирает точку в начале имени класса
   }
 }
 
@@ -777,12 +779,12 @@ __webpack_require__.r(__webpack_exports__);
  // Открывает модальное окно
 
 window.addEventListener('DOMContentLoaded', () => {
-  // const modalTimerId = setTimeout(() => modalShow(modalTimerId), 300000);
+  // const modalTimerId = setTimeout(() => modalShow('.modal', modalTimerId), 300000);
   // Автоматически открывает модальное окно по таймеру через 5 минут, передать его аргументом в modal()
 
-  (0,_modules_tabs__WEBPACK_IMPORTED_MODULE_0__["default"])();
+  (0,_modules_tabs__WEBPACK_IMPORTED_MODULE_0__["default"])('.tabcontent', '.tabheader__items', '.tabheader__item');
   (0,_modules_timer__WEBPACK_IMPORTED_MODULE_1__["default"])();
-  (0,_modules_modal__WEBPACK_IMPORTED_MODULE_2__["default"])(); // сюда аргументом передать modalTimerId, чтобы таймер удалялся при открытии модального окна
+  (0,_modules_modal__WEBPACK_IMPORTED_MODULE_2__["default"])('.modal', '[data-modal]'); // сюда третьим аргументом передать modalTimerId, чтобы таймер удалялся при открытии модального окна
   (0,_modules_cards__WEBPACK_IMPORTED_MODULE_3__["default"])();
   (0,_modules_forms__WEBPACK_IMPORTED_MODULE_4__["default"])();
   (0,_modules_slider__WEBPACK_IMPORTED_MODULE_5__["default"])();
