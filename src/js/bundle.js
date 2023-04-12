@@ -333,15 +333,27 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-function slider() {
-  const sliderBlock = document.querySelector('.offer__slider');
-  const current = document.querySelector('#current');
-  const total = document.querySelector('#total');
-  const inner = document.querySelector('.offer__slider-inner');
-  const wrapper = document.querySelector('.offer__slider-wrapper');
-  const slides = document.querySelectorAll('.offer__slide'); // клоны сюда не попадут, это статический nodelist
+function slider({
+  sliderBlockSelector,
+  currentSelector,
+  totalSelector,
+  innerSelector,
+  wrapperSelector,
+  slideSelector,
+  navigationSelector,
+  dotSelector,
+  nextArrowSelector,
+  prevArrowSelector,
+}) {
+  const sliderBlock = document.querySelector(sliderBlockSelector); // '.offer__slider'
+  const current = document.querySelector(currentSelector); // '#current'
+  const total = document.querySelector(totalSelector); // '#total'
+  const inner = document.querySelector(innerSelector); // '.offer__slider-inner'
+  const wrapper = document.querySelector(wrapperSelector); // '.offer__slider-wrapper'
+  const slides = document.querySelectorAll(slideSelector); // клоны сюда не попадут, это статический nodelist // '.offer__slide'
+  const nav = document.querySelector(navigationSelector); // блок с точками // '.offer__slider-navigation'
+
   const transition = 0.75; // время плавного перехода между слайдами в секундах
-  const nav = document.querySelector('.offer__slider-navigation'); // блок с точками
   const wrapperWidth = parseInt(window.getComputedStyle(wrapper).width, 10); // parseInt отбрасывает 'px'
   const threshold = wrapperWidth * 0.33; // порог, после которого переключается слайд = треть от ширины одного слайда
   let mouseStart = 0; // начальное положение мыши
@@ -364,20 +376,20 @@ function slider() {
 
   function sliderInitialization() { // создание элементов слайдера и задание начального положения
     const firstSlideClone = document.createElement('div'); // создает клон первого слайда и помещает его в конец
-    firstSlideClone.classList.add('offer__slide');
+    firstSlideClone.classList.add(`${slideSelector.slice(1)}`); // slice убирает точку в начале
     firstSlideClone.innerHTML = slides[0].innerHTML;
     inner.append(firstSlideClone);
 
     const lastSlideClone = document.createElement('div'); // создает клон последнего слайда и помещает его в начало
-    lastSlideClone.classList.add('offer__slide');
+    lastSlideClone.classList.add(`${slideSelector.slice(1)}`); // slice убирает точку в начале
     lastSlideClone.innerHTML = slides[slides.length - 1].innerHTML;
     inner.prepend(lastSlideClone);
 
     for (let i = 0; i < slides.length; i += 1) { // создает точки по количеству слайдов
       const dot = document.createElement('div');
-      dot.classList.add('offer__slider-dot');
+      dot.classList.add(`${dotSelector.slice(1)}`); // slice убирает точку в начале
       nav.append(dot);
-      dots = document.querySelectorAll('.offer__slider-dot');
+      dots = document.querySelectorAll(dotSelector); // '.offer__slider-dot'
     }
 
     inner.style.width = `${wrapperWidth * (slides.length + 2)}px`; // устанавливает ширину ленты со слайдами, +2 это два клона, которых нет в slides
@@ -395,8 +407,8 @@ function slider() {
 
   function currentAndDots() { // показывает номер слайда и делает активной точку
     current.textContent = getZero(slideIndex); // getZero добавляет ноль, если число из 1 цифры
-    dots.forEach((dot) => dot.classList.remove('offer__slider-dot-active')); // удаляет класс активности со всех точек
-    dots[slideIndex - 1].classList.add('offer__slider-dot-active'); // показывает точку по индексу
+    dots.forEach((dot) => dot.classList.remove(`${dotSelector.slice(1)}_active`)); // удаляет класс активности со всех точек
+    dots[slideIndex - 1].classList.add(`${dotSelector.slice(1)}_active`); // показывает точку по индексу
   }
 
   function showSlide() { // показывает слайд по индексу
@@ -449,12 +461,14 @@ function slider() {
 
   function sliderBtnsClicks() { // клик на кнопки и точки
     sliderBlock.addEventListener('click', (event) => {
+      event.preventDefault();
       if (canSlide === true) { // не запускает обработчик, пока не прошла задержка
-        if (event.target && event.target.matches('[data-action="next"]')) { // data-аттрибуты добавить блоку с кнопкой и самой картинке со стрелкой
+        if (event.target && event.target.closest(nextArrowSelector) && sliderBlock.contains(event.target.closest(nextArrowSelector))) {
+          // closest возвращает ближайший родительский элемент (или сам элемент), который соответствует. contains проверяет, что соотв. элемент находится внутри слайдера
           nextSlide();
-        } else if (event.target && event.target.matches('[data-action="prev"]')) {
+        } else if (event.target && event.target.closest(prevArrowSelector) && sliderBlock.contains(event.target.closest(prevArrowSelector))) {
           prevSlide();
-        } else if (event.target && event.target.matches('.offer__slider-dot')) { // клик на точки
+        } else if (event.target && event.target.closest(dotSelector) && sliderBlock.contains(event.target.closest(dotSelector))) { // клик на точки
           addAnimation(); // добавляет анимацию плавного перелистывания
           dots.forEach((item, i) => {
             if (item === event.target) { // находит точку, на которую нажали
@@ -787,7 +801,18 @@ window.addEventListener('DOMContentLoaded', () => {
   (0,_modules_modal__WEBPACK_IMPORTED_MODULE_2__["default"])('.modal', '[data-modal]'); // сюда третьим аргументом передать modalTimerId, чтобы таймер удалялся при открытии модального окна
   (0,_modules_cards__WEBPACK_IMPORTED_MODULE_3__["default"])();
   (0,_modules_forms__WEBPACK_IMPORTED_MODULE_4__["default"])();
-  (0,_modules_slider__WEBPACK_IMPORTED_MODULE_5__["default"])();
+  (0,_modules_slider__WEBPACK_IMPORTED_MODULE_5__["default"])({
+    sliderBlockSelector: '.offer__slider',
+    currentSelector: '#current',
+    totalSelector: '#total',
+    innerSelector: '.offer__slider-inner',
+    wrapperSelector: '.offer__slider-wrapper',
+    slideSelector: '.offer__slide',
+    navigationSelector: '.offer__slider-navigation',
+    dotSelector: '.offer__slider-dot',
+    nextArrowSelector: '.offer__slider-next',
+    prevArrowSelector: '.offer__slider-prev',
+  });
   (0,_modules_calc__WEBPACK_IMPORTED_MODULE_6__["default"])();
 
 });

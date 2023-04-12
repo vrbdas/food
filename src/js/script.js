@@ -17,7 +17,18 @@ window.addEventListener('DOMContentLoaded', () => {
   modal('.modal', '[data-modal]'); // сюда третьим аргументом передать modalTimerId, чтобы таймер удалялся при открытии модального окна
   cards();
   forms();
-  slider();
+  slider({
+    sliderBlockSelector: '.offer__slider',
+    currentSelector: '#current',
+    totalSelector: '#total',
+    innerSelector: '.offer__slider-inner',
+    wrapperSelector: '.offer__slider-wrapper',
+    slideSelector: '.offer__slide',
+    navigationSelector: '.offer__slider-navigation',
+    dotSelector: '.offer__slider-dot',
+    nextArrowSelector: '.offer__slider-next',
+    prevArrowSelector: '.offer__slider-prev',
+  });
   calc();
 
 });

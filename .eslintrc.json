@@ -74,6 +74,7 @@
     "import/prefer-default-export": 1,
     "import/no-mutable-exports": 1,
     "import/newline-after-import": 1,
-    "import/no-duplicates": 1
+    "import/no-duplicates": 1,
+    "spaced-comment": 1
   }
 }
