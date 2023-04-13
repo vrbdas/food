@@ -1,6 +1,6 @@
 'use strict';
 
-let path = require('path');
+const path = require('path');
 
 module.exports = {
   mode: 'development',
@@ -14,7 +14,25 @@ module.exports = {
   devtool: 'source-map',
 
   module: {
-
+    rules: [
+      {
+        test: /\.(?:js|mjs|cjs)$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [
+              ['@babel/preset-env', {
+                targets: 'ie 11',
+                debug: true,
+                corejs: 3.30,
+                useBuiltIns: 'usage',
+              }],
+            ],
+          },
+        },
+      },
+    ],
   },
 
 };
