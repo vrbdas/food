@@ -200,9 +200,9 @@
     <div class="order">
         <div class="container">
             <div class="title">Заказывай пробный день прямо сейчас!</div>
-            <form action="#" class="order__form">
+            <form novalidate action="#" class="order__form">
                 <div class="order__name">
-                    <input required minlength="3" maxlength="50" placeholder="Ваше имя" name="name" type="text" class="order__input">
+                    <input required minlength="2" maxlength="50" placeholder="Ваше имя" name="name" type="text" class="order__input">
                     <span class="error"></span>
                 </div>
                 <div class="order__phone">
@@ -274,11 +274,11 @@
     <div class="modal hide">
         <div class="modal__dialog">
             <div class="modal__content">
-                <form action="#">
+                <form novalidate action="#">
                     <div data-close class="modal__close">&times;</div>
                     <div class="modal__title">Мы свяжемся с вами как можно быстрее!</div>
                     <div class="modal__name">
-                        <input required minlength="3" maxlength="50" placeholder="Ваше имя" name="name" type="text" class="modal__input">
+                        <input required minlength="2" maxlength="50" placeholder="Ваше имя" name="name" type="text" class="modal__input">
                         <span class="error"></span>
                     </div>
                     <div class="modal__phone">

@@ -8,20 +8,19 @@ function forms() {
 
   const formInputs = document.querySelectorAll('form input'); // все input в формах
 
-  formInputs.forEach((input) => { // проверяет при вводе
+  formInputs.forEach((input) => { // проверяет значение при вводе
     const errorElem = input.nextElementSibling; // следующий соседний с input элемент это span с ошибкой
     input.addEventListener('input', (event) => {
       errorElem.textContent = ''; // сбросить содержимое сообщения
       errorElem.className = 'error'; // сбросить визуальное состояние сообщения
       if (!event.target.validity.valid) {
-        errorText(event.target, errorElem); // получить содержимое сообщения
-        errorElem.className = 'error_active'; // показать сообщение с ошибкой
+        showError(event.target, errorElem); // показать сообщение с ошибкой
       }
     });
   });
 
-  function errorText(inputElem, errorElem) { // текст сообщения в зависимости от ошибки
-    if (inputElem.validity.valueMissing) {
+  function showError(inputElem, errorElem) { // показать сообщение с ошибкой
+    if (inputElem.validity.valueMissing) { // текст сообщения в зависимости от ошибки
       errorElem.textContent = 'Заполните поле';
     } else if (inputElem.validity.tooShort) {
       errorElem.textContent = `Имя должно быть не короче ${inputElem.minLength} символов`;
@@ -29,6 +28,7 @@ function forms() {
       // для email можно создать такое же условие для type="email" с другим сообщением
       errorElem.textContent = 'Введите номер телефона';
     }
+    errorElem.className = 'error_active';
   }
 
   formTags.forEach((item) => { // На каждую форму вешает обработчик формы
@@ -38,6 +38,20 @@ function forms() {
   function bindPostData(form) {
     form.addEventListener('submit', (event) => { // Событие отправка формы кликом на кнопку или enter
       event.preventDefault();
+
+      const currentFormInputs = event.target.querySelectorAll('input'); // инпуты в этой конкретной форме
+      let valid = true;
+      currentFormInputs.forEach((input) => {
+        const errorElem = input.nextElementSibling; // следующий соседний с input элемент это span с ошибкой
+        if (!input.validity.valid) {
+          showError(input, errorElem); // показать сообщение с ошибкой
+          valid = false;
+        }
+      });
+
+      if (valid === false) { // если input не валидны, прерывает выполнение функции
+        return;
+      }
 
       const spinner = document.createElement('img'); // К форме добавляется спиннер загрузки
       spinner.setAttribute('src', 'img/form/spinner.svg');
