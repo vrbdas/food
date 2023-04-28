@@ -13,6 +13,12 @@
             transform: scale(1.5);
         }
     }
+    &__phone {
+        position: relative;
+    }
+    &__name {
+        position: relative;
+    }
     &__input {
         width: 280px;
         height: 50px;

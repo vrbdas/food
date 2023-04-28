@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -10,6 +11,10 @@ module.exports = {
     path: `${__dirname}/src/js`,
   },
   watch: true,
+  optimization: {
+    minimize: true,
+    minimizer: [new TerserPlugin()],
+  },
 
   devtool: 'source-map',
 
@@ -34,5 +39,4 @@ module.exports = {
       },
     ],
   },
-
 };

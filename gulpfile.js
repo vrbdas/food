@@ -4,6 +4,10 @@ const gulp = require('gulp');
 const sass = require('gulp-sass')(require('sass'));
 const autoprefixer = require('gulp-autoprefixer');
 const clean = require('gulp-clean');
+const cleanCSS = require('gulp-clean-css');
+const rename = require('gulp-rename');
+const htmlmin = require('gulp-htmlmin');
+const sourcemaps = require('gulp-sourcemaps');
 
 const destFolder = 'Food';
  
@@ -12,11 +16,14 @@ gulp.task('clean', function () {
         .pipe(clean({force: true}))
   });
 
-
 gulp.task('styles', function() {
     return gulp.src("src/scss/**/*.+(scss|sass)")
-        .pipe(sass().on('error', sass.logError))
+        .pipe(sourcemaps.init())
+        .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
+        .pipe(rename({suffix: '.min', prefix: ''}))
         .pipe(autoprefixer())
+        .pipe(cleanCSS({compatibility: 'ie8'}))
+        .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(`C:/Code/domains/${destFolder}/css`))
 });
 
@@ -25,13 +32,13 @@ gulp.task('watch', function() {
     gulp.watch("src/*.html").on('change', gulp.parallel('html'));
     gulp.watch("src/js/**/*").on('change', gulp.parallel('scripts'));
     gulp.watch("src/fonts/**/*").on('all', gulp.parallel('fonts'));
-    gulp.watch("src/php/**/*").on('change', gulp.parallel('php'));
     gulp.watch("src/svg/**/*").on('all', gulp.parallel('svg'));
     gulp.watch("src/img/**/*").on('all', gulp.parallel('images'));
 });
 
 gulp.task('html', function () {
     return gulp.src("src/*.html")
+        .pipe(htmlmin({ collapseWhitespace: true }))
         .pipe(gulp.dest(`C:/Code/domains/${destFolder}/`));
 });
 
@@ -45,11 +52,6 @@ gulp.task('fonts', function () {
         .pipe(gulp.dest(`C:/Code/domains/${destFolder}/fonts`))
 });
 
-gulp.task('php', function () {
-    return gulp.src("src/php/**/*.php")
-        .pipe(gulp.dest(`C:/Code/domains/${destFolder}/php`))
-});
-
 gulp.task('svg', function () {
     return gulp.src("src/svg/**/*")
         .pipe(gulp.dest(`C:/Code/domains/${destFolder}/svg`))
@@ -60,4 +62,4 @@ gulp.task('images', function () {
         .pipe(gulp.dest(`C:/Code/domains/${destFolder}/img`))
 });
 
-gulp.task('default',gulp.series('clean', gulp.parallel('styles', 'watch', 'html', 'scripts', 'fonts', 'php', 'svg',  'images')));
+gulp.task('default',gulp.series('clean', gulp.parallel('styles', 'watch', 'html', 'scripts', 'fonts', 'svg',  'images')));

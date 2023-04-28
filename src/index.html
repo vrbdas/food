@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Food</title>
     <link rel="icon" href="svg/favicon.svg" type="image/x-icon">
-    <link rel="stylesheet" href="css/style.css">
+    <style>img[alt="www.000webhost.com"]{display:none;}</style>
+    <link rel="stylesheet" href="css/style.min.css">
 </head>
 <body>
     <header class="header">
@@ -187,7 +188,7 @@
     <div class="divider"></div>
 
     <div id="menu" class="menu">
-        <h2 class="title>Наше меню на день</h2>
+        <h2 class="title">Наше меню на день</h2>
 
         <div class="menu__field">
             <div class="container">
@@ -200,8 +201,14 @@
         <div class="container">
             <div class="title">Заказывай пробный день прямо сейчас!</div>
             <form action="#" class="order__form">
-                <input required placeholder="Ваше имя" name="name" type="text" class="order__input">
-                <input required placeholder="Ваш номер телефона" name="phone" type="phone" class="order__input">
+                <div class="order__name">
+                    <input required minlength="3" maxlength="50" placeholder="Ваше имя" name="name" type="text" class="order__input">
+                    <span class="error"></span>
+                </div>
+                <div class="order__phone">
+                    <input required pattern="^\+?[78][-\(]?\d{3}\)?-?\d{3}-?\d{2}-?\d{2}$" maxlength="20" placeholder="Ваш номер телефона" name="phone" type="phone" class="order__input">
+                    <span class="error"></span>
+                </div>
                 <img src="svg/right.svg" alt="right">
                 <button class="btn btn_dark btn_min">Перезвонить мне</button>
             </form>
@@ -270,8 +277,14 @@
                 <form action="#">
                     <div data-close class="modal__close">&times;</div>
                     <div class="modal__title">Мы свяжемся с вами как можно быстрее!</div>
-                    <input required placeholder="Ваше имя" name="name" type="text" class="modal__input">
-                    <input required placeholder="Ваш номер телефона" name="phone" type="phone" class="modal__input">
+                    <div class="modal__name">
+                        <input required minlength="3" maxlength="50" placeholder="Ваше имя" name="name" type="text" class="modal__input">
+                        <span class="error"></span>
+                    </div>
+                    <div class="modal__phone">
+                        <input required pattern="^\+?[78][-\(]?\d{3}\)?-?\d{3}-?\d{2}-?\d{2}$" placeholder="Ваш номер телефона" name="phone" type="phone" maxlength="20" class="modal__input">
+                        <span class="error"></span>
+                    </div>
                     <button class="btn btn_dark btn_min">Перезвонить мне</button>
                 </form>
             </div>

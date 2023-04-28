@@ -39,6 +39,7 @@
         text-transform: uppercase;
     }
     &__input {
+        position: relative;
         display: block;
         margin: 20px auto 20px auto;
         width: 280px;
@@ -55,5 +56,11 @@
         display: block;
         width: 280px;
         margin: 0 auto;
+    }
+    &__phone {
+        position: relative;
+    }
+    &__name {
+        position: relative;
     }
 }

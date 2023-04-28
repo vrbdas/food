@@ -1,9 +1,35 @@
 import {modalShow, modalHide} from './modal';
 import {postData} from '../services/services';
 
+
 function forms() {
-  const formTags = document.querySelectorAll('form');
+  const formTags = document.querySelectorAll('form'); // формы на странице
   const modalBlock = document.querySelector('.modal'); // изначально в html стоит класс .hide
+
+  const formInputs = document.querySelectorAll('form input'); // все input в формах
+
+  formInputs.forEach((input) => { // проверяет при вводе
+    const errorElem = input.nextElementSibling; // следующий соседний с input элемент это span с ошибкой
+    input.addEventListener('input', (event) => {
+      errorElem.textContent = ''; // сбросить содержимое сообщения
+      errorElem.className = 'error'; // сбросить визуальное состояние сообщения
+      if (!event.target.validity.valid) {
+        errorText(event.target, errorElem); // получить содержимое сообщения
+        errorElem.className = 'error_active'; // показать сообщение с ошибкой
+      }
+    });
+  });
+
+  function errorText(inputElem, errorElem) { // текст сообщения в зависимости от ошибки
+    if (inputElem.validity.valueMissing) {
+      errorElem.textContent = 'Заполните поле';
+    } else if (inputElem.validity.tooShort) {
+      errorElem.textContent = `Имя должно быть не короче ${inputElem.minLength} символов`;
+    } else if (inputElem.validity.patternMismatch && inputElem.matches('[type="phone"]')) {
+      // для email можно создать такое же условие для type="email" с другим сообщением
+      errorElem.textContent = 'Введите номер телефона';
+    }
+  }
 
   formTags.forEach((item) => { // На каждую форму вешает обработчик формы
     bindPostData(item);
