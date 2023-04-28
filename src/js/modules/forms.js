@@ -5,19 +5,28 @@ import {postData} from '../services/services';
 function forms() {
   const formTags = document.querySelectorAll('form'); // формы на странице
   const modalBlock = document.querySelector('.modal'); // изначально в html стоит класс .hide
+  const formInputs = document.querySelectorAll('form input');
 
-  const formInputs = document.querySelectorAll('form input'); // все input в формах
-
-  formInputs.forEach((input) => { // проверяет значение при вводе
-    const errorElem = input.nextElementSibling; // следующий соседний с input элемент это span с ошибкой
-    input.addEventListener('input', (event) => {
-      errorElem.textContent = ''; // сбросить содержимое сообщения
-      errorElem.className = 'error'; // сбросить визуальное состояние сообщения
-      if (!event.target.validity.valid) {
-        showError(event.target, errorElem); // показать сообщение с ошибкой
-      }
+  formInputs.forEach((item) => { // проверять при вводе все input
+    item.addEventListener('input', () => {
+      validCheck(item);
     });
   });
+
+  formTags.forEach((item) => {
+    bindPostData(item); // На каждую форму вешает обработчик формы
+  });
+
+  function validCheck(inputElem) {
+    const errorElem = inputElem.nextElementSibling; // следующий соседний с input элемент это span с ошибкой
+    errorElem.textContent = ''; // сбросить содержимое сообщения
+    errorElem.className = 'error'; // сбросить визуальное состояние сообщения
+    if (!inputElem.validity.valid) {
+      showError(inputElem, errorElem); // показать сообщение с ошибкой
+      return false;
+    }
+    return true;
+  }
 
   function showError(inputElem, errorElem) { // показать сообщение с ошибкой
     if (inputElem.validity.valueMissing) { // текст сообщения в зависимости от ошибки
@@ -31,25 +40,19 @@ function forms() {
     errorElem.className = 'error_active';
   }
 
-  formTags.forEach((item) => { // На каждую форму вешает обработчик формы
-    bindPostData(item);
-  });
-
   function bindPostData(form) {
     form.addEventListener('submit', (event) => { // Событие отправка формы кликом на кнопку или enter
       event.preventDefault();
 
-      const currentFormInputs = event.target.querySelectorAll('input'); // инпуты в этой конкретной форме
-      let valid = true;
-      currentFormInputs.forEach((input) => {
-        const errorElem = input.nextElementSibling; // следующий соседний с input элемент это span с ошибкой
-        if (!input.validity.valid) {
-          showError(input, errorElem); // показать сообщение с ошибкой
-          valid = false;
-        }
-      });
+      const eventInputs = event.target.querySelectorAll('input');
 
-      if (valid === false) { // если input не валидны, прерывает выполнение функции
+      const arr = []; // доделать это всё
+      eventInputs.forEach((item) => {
+        arr.push(validCheck(item));
+      });
+      const valid = arr.find((item) => item === false);
+
+      if (valid === false) {
         return;
       }
 
