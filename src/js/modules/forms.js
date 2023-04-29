@@ -44,16 +44,12 @@ function forms() {
     form.addEventListener('submit', (event) => { // Событие отправка формы кликом на кнопку или enter
       event.preventDefault();
 
-      const eventInputs = event.target.querySelectorAll('input');
-
-      const arr = []; // доделать это всё
-      eventInputs.forEach((item) => {
-        arr.push(validCheck(item));
-      });
-      const valid = arr.find((item) => item === false);
-
-      if (valid === false) {
-        return;
+      const eventInputs = event.target.querySelectorAll('input'); // все input в форме, которую пытаются отправить
+      eventInputs.forEach((input) => validCheck(input)); // для каждого input проверяет на ошибки и выводит сообщения об ошибке
+      for (const input of eventInputs) {
+        if (!validCheck(input)) { // прерывает дальнейшее выполнение функции, если хотя бы в одном поле ошибка
+          return;
+        }
       }
 
       const spinner = document.createElement('img'); // К форме добавляется спиннер загрузки

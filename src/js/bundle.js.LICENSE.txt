@@ -14,6 +14,8 @@
 
 /*! ../internals/array-for-each */
 
+/*! ../internals/array-from */
+
 /*! ../internals/array-includes */
 
 /*! ../internals/array-iteration */
@@ -29,6 +31,8 @@
 /*! ../internals/array-species-constructor */
 
 /*! ../internals/array-species-create */
+
+/*! ../internals/call-with-safe-iteration-closing */
 
 /*! ../internals/check-correctness-of-iteration */
 
@@ -338,7 +342,7 @@
 
 /*! core-js/modules/es.array.concat.js */
 
-/*! core-js/modules/es.array.find.js */
+/*! core-js/modules/es.array.from.js */
 
 /*! core-js/modules/es.array.iterator.js */
 
@@ -527,6 +531,10 @@
   \******************************************************/
 
 /*!******************************************************!*\
+  !*** ./node_modules/core-js/internals/array-from.js ***!
+  \******************************************************/
+
+/*!******************************************************!*\
   !*** ./node_modules/core-js/internals/get-method.js ***!
   \******************************************************/
 
@@ -575,7 +583,7 @@
   \*******************************************************/
 
 /*!*******************************************************!*\
-  !*** ./node_modules/core-js/modules/es.array.find.js ***!
+  !*** ./node_modules/core-js/modules/es.array.from.js ***!
   \*******************************************************/
 
 /*!*******************************************************!*\
@@ -1116,6 +1124,10 @@
 
 /*!****************************************************************************!*\
   !*** ./node_modules/core-js/internals/array-method-has-species-support.js ***!
+  \****************************************************************************/
+
+/*!****************************************************************************!*\
+  !*** ./node_modules/core-js/internals/call-with-safe-iteration-closing.js ***!
   \****************************************************************************/
 
 /*!****************************************************************************!*\
