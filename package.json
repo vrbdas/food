@@ -13,6 +13,7 @@
     "@babel/core": "^7.21.4",
     "@babel/preset-env": "^7.21.4",
     "babel-loader": "^9.1.2",
+    "browser-sync": "^2.29.1",
     "gulp": "^4.0.2",
     "gulp-autoprefixer": "^6.1.0",
     "gulp-clean": "^0.4.0",
@@ -32,6 +33,7 @@
     "> 1%"
   ],
   "dependencies": {
-    "core-js": "^3.30.0"
+    "core-js": "^3.30.0",
+    "imask": "^6.6.1"
   }
 }

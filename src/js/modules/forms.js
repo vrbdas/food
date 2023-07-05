@@ -1,15 +1,29 @@
+import IMask from 'imask';
 import {modalShow, modalHide} from './modal';
 import {postData} from '../services/services';
-
 
 function forms() {
   const formTags = document.querySelectorAll('form'); // формы на странице
   const modalBlock = document.querySelector('.modal'); // изначально в html стоит класс .hide
   const formInputs = document.querySelectorAll('form input');
 
-  formInputs.forEach((item) => { // проверять при вводе все input
-    item.addEventListener('input', () => {
-      validCheck(item);
+  const phoneInputs = document.querySelectorAll('[name=phone]');
+
+  phoneInputs.forEach((item) => { // маска для ввода номера
+    IMask(item, {
+      mask: '+{7}(000)000-00-00',
+    });
+  });
+
+  formInputs.forEach((inputElem) => { // проверять при вводе все input
+    const errorElem = inputElem.nextElementSibling; // следующий соседний с input элемент это span с ошибкой
+    inputElem.addEventListener('focus', () => {
+      errorElem.textContent = ''; // сбросить содержимое сообщения
+      errorElem.className = 'error'; // сбросить визуальное состояние сообщения
+      inputElem.style.borderColor = 'unset'; // сброс красной рамки
+    });
+    inputElem.addEventListener('blur', () => {
+      validCheck(inputElem, errorElem);
     });
   });
 
@@ -17,12 +31,12 @@ function forms() {
     bindPostData(item); // На каждую форму вешает обработчик формы
   });
 
-  function validCheck(inputElem) {
-    const errorElem = inputElem.nextElementSibling; // следующий соседний с input элемент это span с ошибкой
+  function validCheck(inputElem, errorElem) {
+
     errorElem.textContent = ''; // сбросить содержимое сообщения
-    errorElem.className = 'error'; // сбросить визуальное состояние сообщения
     if (!inputElem.validity.valid) {
       showError(inputElem, errorElem); // показать сообщение с ошибкой
+      inputElem.style.borderColor = 'red';
       return false;
     }
     return true;
@@ -45,9 +59,9 @@ function forms() {
       event.preventDefault();
 
       const eventInputs = event.target.querySelectorAll('input'); // все input в форме, которую пытаются отправить
-      eventInputs.forEach((input) => validCheck(input)); // для каждого input проверяет на ошибки и выводит сообщения об ошибке
+      eventInputs.forEach((input) => validCheck(input, input.nextElementSibling)); // для каждого input проверяет на ошибки и выводит сообщения об ошибке
       for (const input of eventInputs) {
-        if (!validCheck(input)) { // прерывает дальнейшее выполнение функции, если хотя бы в одном поле ошибка
+        if (!validCheck(input, input.nextElementSibling)) { // прерывает дальнейшее выполнение функции, если хотя бы в одном поле ошибка
           return;
         }
       }
@@ -83,6 +97,7 @@ function forms() {
   function showThanksModal(text) { // Меняет модальное окно на сообщение об отправке
     const formModalDialog = document.querySelector('.modal__dialog');
 
+    formModalDialog.classList.remove('show');
     formModalDialog.classList.add('hide'); // Скрывает внутреннюю часть старого окна
     modalShow('.modal'); // Показывает модальное окно с пустой внутренней частью
 
