@@ -27,4 +27,4 @@
 
 ## 🔗 Демо
 
-[Открыть сайт](https://vrbdas.github.io/Food/)
+[Открыть сайт](https://vrbdas.github.io/food/)
